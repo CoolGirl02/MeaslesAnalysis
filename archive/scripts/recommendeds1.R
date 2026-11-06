@@ -19,7 +19,7 @@ final_ts <- final_ts %>%
     )
   )
 
-p_epidemic_curves <- ggplot(
+p_epidemic_curves <- ggplot(  # start the plot
   final_ts,
   aes(
     x = time,
@@ -28,11 +28,11 @@ p_epidemic_curves <- ggplot(
     group = Scenario
   )
 ) +
-  geom_line(
+  geom_line(  # draw the time series
     linetype = "solid",
     linewidth = 1.1
   ) +
-  facet_wrap(
+  facet_wrap(  # one panel per group
     ~Cutoff,
     ncol = 3
   ) +
@@ -40,13 +40,13 @@ p_epidemic_curves <- ggplot(
     name = "Vaccination Strategy",
     values = strategy_colours
   ) +
-  labs(
+  labs(  # titles and axis labels
     title = "Measles Epidemic Curves Across School-Size Cutoffs",
     subtitle = "Comparison of vaccination allocation strategies with matched aggregate coverage",
     x = "Time (Days)",
     y = "Number of Infectious Students"
   ) +
-  theme_minimal() +
+  theme_minimal() +  # plain plot theme
   theme(
     plot.title = element_text(face = "bold", size = 13),
     plot.subtitle = element_text(size = 10),
@@ -62,4 +62,4 @@ p_epidemic_curves <- ggplot(
     panel.grid.minor = element_blank()
   )
 
-print(p_epidemic_curves)
+print(p_epidemic_curves)  # show the result

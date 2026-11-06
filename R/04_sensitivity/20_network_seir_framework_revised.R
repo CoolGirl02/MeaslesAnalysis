@@ -1,26 +1,26 @@
-suppressPackageStartupMessages({
-  library(tidyverse)
-  library(deSolve)
-  library(igraph)
+suppressPackageStartupMessages({  # load packages quietly
+  library(tidyverse)  # data wrangling and plots
+  library(deSolve)  # ODE solver
+  library(igraph)  # network tools
 })
 
-theme_set(
-  theme_minimal() +
+theme_set(  # default plot theme
+  theme_minimal() +  # plain plot theme
     theme(
       plot.title = element_text(face = "bold", size = 12)
     )
 )
 
-df <- read.csv(
+df <- read.csv(  # read the table
   "data/processed/school_data_joined.csv"
 ) %>%
   rename_with(tolower)
 
-if (!"unit_id" %in% names(df)) {
+if (!"unit_id" %in% names(df)) {  # add a school id if the column is missing
 
   df <- df %>%
     mutate(
-      unit_id = as.character(row_number())
+      unit_id = as.character(row_number())  # index the schools
     )
 
 } else {
@@ -36,22 +36,22 @@ df <- df %>%
   mutate(
 
     vax_rate = if_else(
-      percent_immunized > 1,
+      percent_immunized > 1,  # values above 1 are percentages, so divide by 100
       percent_immunized / 100,
       percent_immunized
     ),
 
-    school_id = row_number(),
+    school_id = row_number(),  # index the schools
 
-    page = ceiling(school_id / 6)
+    page = ceiling(school_id / 6)  # six schools per figure
 
   )
 
-n_schools <- nrow(df)
+n_schools <- nrow(df)  # number of schools
 
-cat("\nNumber of schools:", n_schools, "\n")
+cat("\nNumber of schools:", n_schools, "\n")  # print a check
 
-net_df <- read.csv(
+net_df <- read.csv(  # read the table
   "data/processed/network_df.csv"
 ) %>%
   rename_with(tolower)
@@ -63,7 +63,7 @@ id_cols <- names(net_df)[
   )
 ]
 
-if (length(id_cols) >= 2) {
+if (length(id_cols) >= 2) {  # use the columns that name the two schools
 
   net_df <- net_df %>%
     rename(
@@ -91,13 +91,13 @@ id_map <- setNames(
   df$unit_id
 )
 
-A <- matrix(
+A <- matrix(  # adjacency matrix used in the model
   0,
   nrow = n_schools,
   ncol = n_schools
 )
 
-for (k in seq_len(nrow(net_df))) {
+for (k in seq_len(nrow(net_df))) {  # one edge at a time
 
   i <- unname(
     id_map[net_df$unit_id_a[k]]
@@ -130,16 +130,16 @@ for (k in seq_len(nrow(net_df))) {
       w <- 0
     }
 
-    A[i, j] <- w
-    A[j, i] <- w
+    A[i, j] <- w  # undirected edge weight
+    A[j, i] <- w  # undirected edge weight
 
   }
 
 }
 
-A_raw <- A
+A_raw <- A  # unscaled school-to-school weights
 
-spectral_radius <- max(
+spectral_radius <- max(  # largest absolute eigenvalue of the network
   Mod(
     eigen(
       A_raw,
@@ -153,26 +153,26 @@ if (
   spectral_radius <= 0
 ) {
 
-  stop(
+  stop(  # stop if this check fails
     "The network spectral radius is zero or invalid. ",
     "Check the school IDs and network contact weights."
   )
 
 }
 
-A <- A_raw / spectral_radius
+A <- A_raw / spectral_radius  # divide every edge by the spectral radius
 
-cat("\n========================================\n")
-cat("NETWORK NORMALIZATION\n")
-cat("========================================\n")
+cat("\n========================================\n")  # print a check
+cat("NETWORK NORMALIZATION\n")  # print a check
+cat("========================================\n")  # print a check
 
-cat(
+cat(  # print a check
   "Original spectral radius:",
   spectral_radius,
   "\n"
 )
 
-cat(
+cat(  # print a check
   "Normalized spectral radius:",
   max(
     Mod(
@@ -185,42 +185,42 @@ cat(
   "\n"
 )
 
-gamma_rate <- 1 / 7
+gamma_rate <- 1 / 7  # recovery rate, 7-day infectious period
 
-sigma_rate <- 1 / 10
+sigma_rate <- 1 / 10  # latency rate, 10-day incubation
 
-beta_rate <- 15 * gamma_rate
+beta_rate <- 15 * gamma_rate  # within-school transmission, R0 about 15
 
-alpha <- 0.05
+alpha <- 0.05  # fraction of transmission coming from other schools
 
-times <- seq(
+times <- seq(  # days to simulate
   0,
   200,
   by = 1
 )
 
-N <- df$total_students
+N <- df$total_students  # students in each school
 
-R0 <- round(
+R0 <- round(  # students already immune
   N * df$vax_rate
 )
 
-I0 <- c(
+I0 <- c(  # index cases at the start
   1,
   rep(0, n_schools - 1)
 )
 
-E0 <- rep(
+E0 <- rep(  # exposed at the start, usually none
   0,
   n_schools
 )
 
-S0 <- pmax(
+S0 <- pmax(  # students still susceptible
   0,
   N - I0 - E0 - R0
 )
 
-initial_state <- c(
+initial_state <- c(  # starting S, E, I, and R
   S0,
   E0,
   I0,
@@ -234,7 +234,7 @@ names(initial_state) <- c(
   paste0("R_", seq_len(n_schools))
 )
 
-params <- list(
+params <- list(  # parameters passed into the solver
   beta = beta_rate,
   sigma = sigma_rate,
   gamma = gamma_rate,
@@ -244,7 +244,7 @@ params <- list(
   n = n_schools
 )
 
-seir_model <- function(
+seir_model <- function(  # SEIR equations for one time step
     time,
     state,
     parameters
@@ -270,9 +270,9 @@ seir_model <- function(
         (3 * n + 1):(4 * n)
       ]
 
-      I_prop <- I / N
+      I_prop <- I / N  # infectious fraction in each school
 
-      lambda <- (
+      lambda <- (  # force of infection from this school and its neighbours
         beta * I_prop
       ) + (
         alpha *
@@ -282,21 +282,21 @@ seir_model <- function(
           )
       )
 
-      dS <- -lambda * S
+      dS <- -lambda * S  # infections leave the susceptible class
 
-      dE <- (
+      dE <- (  # new exposures minus those becoming infectious
         lambda * S
       ) - (
         sigma * E
       )
 
-      dI <- (
+      dI <- (  # new infectious students minus recoveries
         sigma * E
       ) - (
         gamma * I
       )
 
-      dR <- gamma * I
+      dR <- gamma * I  # students leaving the infectious class
 
       list(
         c(
@@ -312,7 +312,7 @@ seir_model <- function(
 
 }
 
-get_total_I <- function(
+get_total_I <- function(  # define the function
     out_df,
     scenario_label,
     seed_type
@@ -320,7 +320,7 @@ get_total_I <- function(
 
   out_df %>%
 
-    pivot_longer(
+    pivot_longer(  # one row per compartment
       cols = -time,
       names_to = "var",
       values_to = "Count"
@@ -350,7 +350,7 @@ get_total_I <- function(
 
 }
 
-run_vax_scenario <- function(
+run_vax_scenario <- function(  # define the function
     vax_vector,
     seed_id
 ) {
@@ -371,7 +371,7 @@ run_vax_scenario <- function(
     n_schools
   )
 
-  S0_vec <- pmax(
+  S0_vec <- pmax(  # larger school id second
     0,
     N - I0_vec - E0_vec - R0_vec
   )
@@ -388,7 +388,7 @@ run_vax_scenario <- function(
   )
 
   out_df <- as.data.frame(
-    ode(
+    ode(  # solve the SEIR equations
       y = state_vec,
       times = times,
       func = seir_model,
@@ -400,7 +400,7 @@ run_vax_scenario <- function(
 
 }
 
-output <- ode(
+output <- ode(  # solve the SEIR equations
   y = initial_state,
   times = times,
   func = seir_model,
@@ -409,9 +409,9 @@ output <- ode(
 
 output <- as.data.frame(output)
 
-results_long <- output %>%
+results_long <- output %>%  # one row per compartment and day
 
-  pivot_longer(
+  pivot_longer(  # one row per compartment
     cols = -time,
     names_to = "var",
     values_to = "Count"
@@ -433,7 +433,7 @@ results_long <- output %>%
 
   ) %>%
 
-  left_join(
+  left_join(  # join the tables
     df,
     by = "school_id"
   ) %>%
@@ -451,18 +451,18 @@ results_long <- output %>%
 
   )
 
-total_pages <- max(
+total_pages <- max(  # number of figure pages
   df$page
 )
 
-for (p in seq_len(total_pages)) {
+for (p in seq_len(total_pages)) {  # one figure page at a time
 
-  page_data <- results_long %>%
+  page_data <- results_long %>%  # schools drawn on this page
     filter(
       page == p
     )
 
-  p_plot <- ggplot(
+  p_plot <- ggplot(  # start the plot
     page_data,
     aes(
       x = time,
@@ -471,11 +471,11 @@ for (p in seq_len(total_pages)) {
     )
   ) +
 
-    geom_line(
+    geom_line(  # draw the time series
       linewidth = 1
     ) +
 
-    scale_color_manual(
+    scale_color_manual(  # set the legend colours or line types
       values = c(
         "S" = "blue",
         "E" = "orange",
@@ -491,13 +491,13 @@ for (p in seq_len(total_pages)) {
       )
     ) +
 
-    facet_wrap(
+    facet_wrap(  # one panel per group
       ~school_label,
       ncol = 3,
       scales = "free_y"
     ) +
 
-    labs(
+    labs(  # titles and axis labels
       title = paste0(
         "Baseline SEIR Measles Simulations (Page ",
         p,
@@ -522,7 +522,7 @@ for (p in seq_len(total_pages)) {
       legend.position = "bottom"
     )
 
-  print(p_plot)
+  print(p_plot)  # show the result
 
 }
 
@@ -533,12 +533,12 @@ net_graph <- graph_from_adjacency_matrix(
   diag = FALSE
 )
 
-df$node_strength <- strength(
+df$node_strength <- strength(  # sum of this school's edge weights
   net_graph,
   weights = E(net_graph)$weight
 )
 
-df$betweenness <- betweenness(
+df$betweenness <- betweenness(  # schools that sit on many shortest paths
   net_graph,
   weights = NA
 )
@@ -563,29 +563,29 @@ low_hub_name <- df$school_name[
   df$school_id == low_hub_id
 ]
 
-cat("\n========================================\n")
-cat("NETWORK HUB AND PERIPHERAL SCHOOL\n")
-cat("========================================\n")
+cat("\n========================================\n")  # print a check
+cat("NETWORK HUB AND PERIPHERAL SCHOOL\n")  # print a check
+cat("========================================\n")  # print a check
 
-cat(
+cat(  # print a check
   "Network Hub:",
   top_hub_name,
   "\n"
 )
 
-cat(
+cat(  # print a check
   "Hub node strength:",
   df$node_strength[top_hub_id],
   "\n"
 )
 
-cat(
+cat(  # print a check
   "Peripheral:",
   low_hub_name,
   "\n"
 )
 
-cat(
+cat(  # print a check
   "Peripheral node strength:",
   df$node_strength[low_hub_id],
   "\n"
@@ -635,7 +635,7 @@ out_peri_916 <- run_vax_scenario(
   low_hub_id
 )
 
-comparison_all <- bind_rows(
+comparison_all <- bind_rows(  # combine these rows
 
   get_total_I(
     out_hub_baseline,
@@ -675,7 +675,7 @@ comparison_all <- bind_rows(
 
 )
 
-p_comparison <- ggplot(
+p_comparison <- ggplot(  # start the plot
   comparison_all,
   aes(
     x = time,
@@ -684,24 +684,24 @@ p_comparison <- ggplot(
   )
 ) +
 
-  geom_line(
+  geom_line(  # draw the time series
     linewidth = 1.2
   ) +
 
-  facet_wrap(
+  facet_wrap(  # one panel per group
     ~Scenario,
     ncol = 3,
     scales = "free_y"
   ) +
 
-  scale_color_manual(
+  scale_color_manual(  # set the legend colours or line types
     values = c(
       "Network Hub" = "firebrick",
       "Peripheral" = "darkblue"
     )
   ) +
 
-  labs(
+  labs(  # titles and axis labels
     title = "Sensitivity Analysis: Hub vs Peripheral Seeding",
 
     subtitle = paste(
@@ -724,9 +724,9 @@ p_comparison <- ggplot(
     )
   )
 
-print(p_comparison)
+print(p_comparison)  # show the result
 
-calculate_outbreak_measures <- function(
+calculate_outbreak_measures <- function(  # define the function
     out_df,
     seed_id
 ) {
@@ -748,7 +748,7 @@ calculate_outbreak_measures <- function(
     length(I_columns) != n_schools
   ) {
 
-    stop(
+    stop(  # stop if this check fails
       "The output does not contain the expected ",
       "susceptible and infectious columns."
     )
@@ -757,14 +757,14 @@ calculate_outbreak_measures <- function(
 
   S_initial <- sapply(
     S_columns,
-    function(x) {
+    function(x) {  # define the function
       out_df[[x]][1]
     }
   )
 
   S_final <- sapply(
     S_columns,
-    function(x) {
+    function(x) {  # define the function
       out_df[[x]][nrow(out_df)]
     }
   )
@@ -991,25 +991,25 @@ table_4_3 <- results_4_3 %>%
 
   )
 
-cat("\n\n")
+cat("\n\n")  # print a check
 
-cat(
+cat(  # print a check
   "============================================================\n"
 )
 
-cat(
+cat(  # print a check
   "TABLE 4.3: COMPARATIVE ANALYSIS OF HUB VS PERIPHERAL\n"
 )
 
-cat(
+cat(  # print a check
   "SEEDING SCENARIOS\n"
 )
 
-cat(
+cat(  # print a check
   "============================================================\n\n"
 )
 
-print(
+print(  # show the result
   table_4_3,
   n = Inf
 )
@@ -1021,7 +1021,7 @@ if (
   )
 ) {
 
-  print(
+  print(  # show the result
     knitr::kable(
       table_4_3,
 
@@ -1045,60 +1045,60 @@ if (
 
 }
 
-write.csv(
+write.csv(  # save the table
   table_4_3,
   "output/tables/table_4_3_hub_vs_peripheral.csv",
   row.names = FALSE
 )
 
-cat("\nTable 4.3 saved successfully.\n")
+cat("\nTable 4.3 saved successfully.\n")  # print a check
 
-cat("\n")
-cat("============================================================\n")
-cat("TOTAL NEW CASES CALCULATED USING SUSCEPTIBLE POPULATION\n")
-cat("============================================================\n")
+cat("\n")  # print a check
+cat("============================================================\n")  # print a check
+cat("TOTAL NEW CASES CALCULATED USING SUSCEPTIBLE POPULATION\n")  # print a check
+cat("============================================================\n")  # print a check
 
-cat(
+cat(  # print a check
   "Formula: C(T) = sum_i [S_i(0) - S_i(T)]\n\n"
 )
 
-cat(
+cat(  # print a check
   "Scenario 1 - Hub:",
   round(baseline_hub["Total_Cases"]),
   "cases\n"
 )
 
-cat(
+cat(  # print a check
   "Scenario 1 - Peripheral:",
   round(baseline_peri["Total_Cases"]),
   "cases\n"
 )
 
-cat(
+cat(  # print a check
   "Scenario 2 - Hub:",
   round(control_74_hub["Total_Cases"]),
   "cases\n"
 )
 
-cat(
+cat(  # print a check
   "Scenario 2 - Peripheral:",
   round(control_74_peri["Total_Cases"]),
   "cases\n"
 )
 
-cat(
+cat(  # print a check
   "Scenario 3 - Hub:",
   round(control_916_hub["Total_Cases"]),
   "cases\n"
 )
 
-cat(
+cat(  # print a check
   "Scenario 3 - Peripheral:",
   round(control_916_peri["Total_Cases"]),
   "cases\n"
 )
 
-cat("\n")
-cat("============================================================\n")
-cat("SIMULATION AND SENSITIVITY ANALYSIS COMPLETED\n")
-cat("============================================================\n")
+cat("\n")  # print a check
+cat("============================================================\n")  # print a check
+cat("SIMULATION AND SENSITIVITY ANALYSIS COMPLETED\n")  # print a check
+cat("============================================================\n")  # print a check

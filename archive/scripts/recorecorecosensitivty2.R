@@ -2,11 +2,11 @@ if (!requireNamespace("ggnewscale", quietly = TRUE)) {
   install.packages("ggnewscale")
 }
 library(ggnewscale)
-library(ggplot2)
-library(dplyr)
-library(tibble)
+library(ggplot2)  # plots
+library(dplyr)  # data wrangling
+library(tibble)  # simple data frames
 
-seed_schools <- bind_rows(
+seed_schools <- bind_rows(  # combine these rows
   hubs_df %>% mutate(Seed_Type = "Hub Schools"),
   periph_df %>% mutate(Seed_Type = "Peripheral Schools")
 )
@@ -25,13 +25,13 @@ peri_color_map <- setNames(c("#984EA3", "#FF7F00", "#A65628"), peri_names)
 all_trajectories <- list()
 all_outcomes     <- list()
 
-for (i in seq_len(nrow(seed_schools))) {
+for (i in seq_len(nrow(seed_schools))) {  # one school at a time
 
   s_id   <- seed_schools$school_id[i]
   s_name <- seed_schools$school_name[i]
   s_type <- seed_schools$Seed_Type[i]
 
-  for (j in seq_len(nrow(vax_scenarios))) {
+  for (j in seq_len(nrow(vax_scenarios))) {  # repeat for each item
 
     scen_name   <- vax_scenarios$Scenario_Name[j]
     target_vax  <- vax_scenarios$vax_val[j]
@@ -67,7 +67,7 @@ for (i in seq_len(nrow(seed_schools))) {
   }
 }
 
-all_ts_data <- bind_rows(all_trajectories) %>%
+all_ts_data <- bind_rows(all_trajectories) %>%  # combine these rows
   mutate(
     Scenario  = factor(Scenario, levels = c("Observed", "74.3%", "96.3%")),
     Seed_Type = factor(Seed_Type, levels = c("Hub Schools", "Peripheral Schools"))
@@ -76,11 +76,11 @@ all_ts_data <- bind_rows(all_trajectories) %>%
 hub_data  <- all_ts_data %>% filter(Seed_Type == "Hub Schools")
 peri_data <- all_ts_data %>% filter(Seed_Type == "Peripheral Schools")
 
-table_outcomes_summary <- bind_rows(all_outcomes)
+table_outcomes_summary <- bind_rows(all_outcomes)  # combine these rows
 
-p_2x3_grid <- ggplot() +
+p_2x3_grid <- ggplot() +  # start the plot
 
-  geom_line(
+  geom_line(  # draw the time series
     data = hub_data,
     aes(
       x     = time,
@@ -91,14 +91,14 @@ p_2x3_grid <- ggplot() +
     linetype  = "solid",
     linewidth = 1
   ) +
-  scale_color_manual(
+  scale_color_manual(  # set the legend colours or line types
     name   = "Hub Schools",
     values = hub_color_map
   ) +
 
   new_scale_color() +
 
-  geom_line(
+  geom_line(  # draw the time series
     data = peri_data,
     aes(
       x     = time,
@@ -109,24 +109,24 @@ p_2x3_grid <- ggplot() +
     linetype  = "solid",
     linewidth = 1
   ) +
-  scale_color_manual(
+  scale_color_manual(  # set the legend colours or line types
     name   = "Peripheral Schools",
     values = peri_color_map
   ) +
 
-  facet_grid(
+  facet_grid(  # one panel per group
     Seed_Type ~ Scenario,
     scales = "free_y"
   ) +
 
-  labs(
+  labs(  # titles and axis labels
     title    = "Epidemic Trajectories Across Coverage Scenarios",
     subtitle = "Top Row: Hub Schools (Solid) | Bottom Row: Peripheral Schools (Solid)",
     x        = "Time (Days)",
     y        = "Number of Infectious Cases"
   ) +
 
-  theme_minimal() +
+  theme_minimal() +  # plain plot theme
   theme(
     legend.position   = "bottom",
     legend.box        = "vertical",
@@ -138,18 +138,18 @@ p_2x3_grid <- ggplot() +
     plot.subtitle     = element_text(size = 10)
   )
 
-print(p_2x3_grid)
+print(p_2x3_grid)  # show the result
 
-cat("\n\n============================================================\n")
-cat("SUMMARY TABLE: HUBS VS PERIPHERALS OUTCOMES (18 SIMULATIONS)\n")
-cat("============================================================\n\n")
+cat("\n\n============================================================\n")  # print a check
+cat("SUMMARY TABLE: HUBS VS PERIPHERALS OUTCOMES (18 SIMULATIONS)\n")  # print a check
+cat("============================================================\n\n")  # print a check
 
-print(table_outcomes_summary, n = Inf, width = Inf)
+print(table_outcomes_summary, n = Inf, width = Inf)  # show the result
 
-write.csv(
+write.csv(  # save the table
   table_outcomes_summary,
   "table_4_2_hubs_vs_peripherals_outcomes.csv",
   row.names = FALSE
 )
 
-cat("\nOutcomes table exported to 'table_4_2_hubs_vs_peripherals_outcomes.csv'\n")
+cat("\nOutcomes table exported to 'table_4_2_hubs_vs_peripherals_outcomes.csv'\n")  # print a check

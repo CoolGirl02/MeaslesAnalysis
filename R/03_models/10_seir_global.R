@@ -1,11 +1,11 @@
-library(tidyverse)
-library(deSolve)
+library(tidyverse)  # data wrangling and plots
+library(deSolve)  # ODE solver
 
-df <- read.csv("data/processed/school_data_joined.csv")
+df <- read.csv("data/processed/school_data_joined.csv")  # read the table
 
 names(df) <- tolower(names(df))
 
-if (!"unit_id" %in% names(df)) {
+if (!"unit_id" %in% names(df)) {  # add a school id if the column is missing
   df$unit_id <- as.character(seq_len(nrow(df)))
 } else {
   df$unit_id <- as.character(df$unit_id)
@@ -21,7 +21,7 @@ required_columns <- c(
 missing_columns <- setdiff(required_columns, names(df))
 
 if (length(missing_columns) > 0) {
-  stop(
+  stop(  # stop if this check fails
     paste(
       "Missing required school-data columns:",
       paste(missing_columns, collapse = ", ")
@@ -32,15 +32,15 @@ if (length(missing_columns) > 0) {
 df <- df %>%
   mutate(
     vax_rate = if_else(
-      percent_immunized > 1,
+      percent_immunized > 1,  # values above 1 are percentages, so divide by 100
       percent_immunized / 100,
       percent_immunized
     ),
-    school_id = row_number(),
-    page = ceiling(school_id / 6)
+    school_id = row_number(),  # index the schools
+    page = ceiling(school_id / 6)  # six schools per figure
   )
 
-n_schools <- nrow(df)
+n_schools <- nrow(df)  # number of schools
 
 seed_school_name <- "Global Academy of SC"
 
@@ -61,28 +61,28 @@ if (length(seed_index) == 0) {
   ]
 
   if (length(possible_matches) > 0) {
-    cat("Possible matching school names:\n")
-    print(possible_matches)
+    cat("Possible matching school names:\n")  # print a check
+    print(possible_matches)  # show the result
   } else {
-    cat("No school containing 'Global Academy' was found.\n")
-    cat("Available school names include:\n")
-    print(head(df$school_name, 20))
+    cat("No school containing 'Global Academy' was found.\n")  # print a check
+    cat("Available school names include:\n")  # print a check
+    print(head(df$school_name, 20))  # show the result
   }
 
-  stop("Seed school not found. Check the school name in the dataset.")
+  stop("Seed school not found. Check the school name in the dataset.")  # stop if this check fails
 }
 
 if (length(seed_index) > 1) {
-  stop("More than one school matches Global Academy of SC.")
+  stop("More than one school matches Global Academy of SC.")  # stop if this check fails
 }
 
-cat(
+cat(  # print a check
   "Seed school found:",
   as.character(df$school_name[seed_index]),
   "\n"
 )
 
-net_df <- read.csv("data/processed/network_df.csv")
+net_df <- read.csv("data/processed/network_df.csv")  # read the table
 
 names(net_df) <- tolower(names(net_df))
 
@@ -98,7 +98,7 @@ missing_network_columns <- setdiff(
 )
 
 if (length(missing_network_columns) > 0) {
-  stop(
+  stop(  # stop if this check fails
     paste(
       "Missing required network-data columns:",
       paste(missing_network_columns, collapse = ", ")
@@ -114,13 +114,13 @@ net_df <- net_df %>%
 
 id_map <- setNames(seq_len(n_schools), df$unit_id)
 
-A <- matrix(
+A <- matrix(  # adjacency matrix used in the model
   0,
   nrow = n_schools,
   ncol = n_schools
 )
 
-for (k in seq_len(nrow(net_df))) {
+for (k in seq_len(nrow(net_df))) {  # one edge at a time
 
   i <- unname(id_map[net_df$unit_id_a[k]])
   j <- unname(id_map[net_df$unit_id_b[k]])
@@ -139,50 +139,50 @@ for (k in seq_len(nrow(net_df))) {
       next
     }
 
-    A[i, j] <- w
-    A[j, i] <- w
+    A[i, j] <- w  # undirected edge weight
+    A[j, i] <- w  # undirected edge weight
   }
 }
 
-spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))
+spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))  # largest absolute eigenvalue of the network
 
-if (!is.finite(spectral_radius) || spectral_radius <= 0) {
-  stop("The network spectral radius is zero or invalid.")
+if (!is.finite(spectral_radius) || spectral_radius <= 0) {  # stop when the spectral radius is not usable
+  stop("The network spectral radius is zero or invalid.")  # stop if this check fails
 }
 
-A <- A / spectral_radius
+A <- A / spectral_radius  # divide every edge by the spectral radius
 
-gamma_rate <- 1 / 7
-sigma_rate <- 1 / 10
-beta_rate <- 15 * gamma_rate
-alpha <- 0.05
+gamma_rate <- 1 / 7  # recovery rate, 7-day infectious period
+sigma_rate <- 1 / 10  # latency rate, 10-day incubation
+beta_rate <- 15 * gamma_rate  # within-school transmission, R0 about 15
+alpha <- 0.05  # fraction of transmission coming from other schools
 
-times <- seq(0, 200, by = 1)
+times <- seq(0, 200, by = 1)  # days to simulate
 
-N <- df$total_students
+N <- df$total_students  # students in each school
 
-R0_count <- round(N * df$vax_rate)
+R0_count <- round(N * df$vax_rate)  # students already immune
 
-I0_count <- rep(0, n_schools)
+I0_count <- rep(0, n_schools)  # index cases at the start
 
 I0_count[seed_index] <- 1
 
-E0_count <- rep(0, n_schools)
+E0_count <- rep(0, n_schools)  # exposed at the start, usually none
 
-S0_count <- pmax(
+S0_count <- pmax(  # students still susceptible
   0,
   N - I0_count - E0_count - R0_count
 )
 
-cat("Initial infectious students:", sum(I0_count), "\n")
+cat("Initial infectious students:", sum(I0_count), "\n")  # print a check
 
-cat(
+cat(  # print a check
   "Infection starts at:",
   as.character(df$school_name[seed_index]),
   "\n"
 )
 
-initial_state <- c(
+initial_state <- c(  # starting S, E, I, and R
   S0_count,
   E0_count,
   I0_count,
@@ -196,7 +196,7 @@ names(initial_state) <- c(
   paste0("R_", seq_len(n_schools))
 )
 
-params <- list(
+params <- list(  # parameters passed into the solver
   beta = beta_rate,
   sigma = sigma_rate,
   gamma = gamma_rate,
@@ -206,7 +206,7 @@ params <- list(
   n = n_schools
 )
 
-seir_model <- function(time, state, parameters) {
+seir_model <- function(time, state, parameters) {  # SEIR equations for one time step
 
   with(as.list(parameters), {
 
@@ -218,34 +218,34 @@ seir_model <- function(time, state, parameters) {
 
     R <- state[3 * n + seq_len(n)]
 
-    I_prop <- I / N
+    I_prop <- I / N  # infectious fraction in each school
 
-    lambda <- (beta * I_prop) +
+    lambda <- (beta * I_prop) +  # force of infection from this school and its neighbours
       (alpha * beta * as.vector(A %*% I_prop))
 
-    dS <- -lambda * S
+    dS <- -lambda * S  # infections leave the susceptible class
 
-    dE <- lambda * S - sigma * E
+    dE <- lambda * S - sigma * E  # new exposures minus those becoming infectious
 
-    dI <- sigma * E - gamma * I
+    dI <- sigma * E - gamma * I  # new infectious students minus recoveries
 
-    dR <- gamma * I
+    dR <- gamma * I  # students leaving the infectious class
 
-    return(list(c(dS, dE, dI, dR)))
+    return(list(c(dS, dE, dI, dR)))  # hand the derivatives to the solver
   })
 }
 
-output <- ode(
+output <- ode(  # solve the SEIR equations
   y = initial_state,
   times = times,
   func = seir_model,
   parms = params
 )
 
-cat("SEIR simulation completed successfully.\n")
+cat("SEIR simulation completed successfully.\n")  # print a check
 
-results_long <- as.data.frame(output) %>%
-  pivot_longer(
+results_long <- as.data.frame(output) %>%  # one row per compartment and day
+  pivot_longer(  # one row per compartment
     cols = -time,
     names_to = "var",
     values_to = "Count"
@@ -254,7 +254,7 @@ results_long <- as.data.frame(output) %>%
     Compartment = str_extract(var, "^[SEIR]"),
     school_id = as.numeric(str_extract(var, "\\d+"))
   ) %>%
-  left_join(df, by = "school_id") %>%
+  left_join(df, by = "school_id") %>%  # join the tables
   mutate(
     school_label = paste0(
       school_name,
@@ -266,14 +266,14 @@ results_long <- as.data.frame(output) %>%
     )
   )
 
-total_pages <- max(df$page)
+total_pages <- max(df$page)  # number of figure pages
 
-for (p in seq_len(total_pages)) {
+for (p in seq_len(total_pages)) {  # one figure page at a time
 
-  page_data <- results_long %>%
+  page_data <- results_long %>%  # schools drawn on this page
     filter(page == p)
 
-  p_plot <- ggplot(
+  p_plot <- ggplot(  # start the plot
     page_data,
     aes(
       x = time,
@@ -283,9 +283,9 @@ for (p in seq_len(total_pages)) {
     )
   ) +
 
-    geom_line(linewidth = 0.8) +
+    geom_line(linewidth = 0.8) +  # draw the time series
 
-    scale_color_manual(
+    scale_color_manual(  # set the legend colours or line types
       values = c(
         "S" = "blue",
         "E" = "orange",
@@ -301,7 +301,7 @@ for (p in seq_len(total_pages)) {
       )
     ) +
 
-    scale_linetype_manual(
+    scale_linetype_manual(  # set the legend colours or line types
       values = c(
         "S" = "solid",
         "E" = "dashed",
@@ -317,7 +317,7 @@ for (p in seq_len(total_pages)) {
       )
     ) +
 
-    facet_wrap(
+    facet_wrap(  # one panel per group
       ~school_label,
       ncol = 3,
       scales = "free_y"
@@ -330,7 +330,7 @@ for (p in seq_len(total_pages)) {
       expand = expansion(mult = c(0, 0.05))
     ) +
 
-    labs(
+    labs(  # titles and axis labels
       title = paste0(
         "SEIR Measles Simulations - Seed: ",
         as.character(df$school_name[seed_index])
@@ -341,7 +341,7 @@ for (p in seq_len(total_pages)) {
       linetype = "Compartment"
     ) +
 
-    theme_minimal() +
+    theme_minimal() +  # plain plot theme
 
     theme(
       strip.text = element_text(
@@ -351,7 +351,7 @@ for (p in seq_len(total_pages)) {
       legend.position = "bottom"
     )
 
-  print(p_plot)
+  print(p_plot)  # show the result
 }
 
-cat("All school plots have been generated.\n")
+cat("All school plots have been generated.\n")  # print a check

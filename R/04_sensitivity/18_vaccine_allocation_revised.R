@@ -7,39 +7,39 @@ required_packages <- c(
   "ggplot2"
 )
 
-for (pkg in required_packages) {
+for (pkg in required_packages) {  # repeat for each item
   if (!requireNamespace(pkg, quietly = TRUE)) {
     install.packages(pkg)
   }
 }
 
-library(deSolve)
-library(dplyr)
-library(readr)
-library(tibble)
-library(tidyr)
-library(ggplot2)
+library(deSolve)  # ODE solver
+library(dplyr)  # data wrangling
+library(readr)  # read and write tables
+library(tibble)  # simple data frames
+library(tidyr)  # reshape tables
+library(ggplot2)  # plots
 
-school_file  <- "data/processed/school_data_joined.csv"
-network_file <- "data/processed/network_df.csv"
+school_file  <- "data/processed/school_data_joined.csv"  # path to the joined school table
+network_file <- "data/processed/network_df.csv"  # path to the edge list
 
-if (!file.exists(school_file) || !file.exists(network_file)) {
-  stop(
+if (!file.exists(school_file) || !file.exists(network_file)) {  # check that the input files exist
+  stop(  # stop if this check fails
     "Input CSV files not found. Check the working directory and file paths."
   )
 }
 
-school_data <- read_csv(
+school_data <- read_csv(  # read the table
   school_file,
   show_col_types = FALSE
 )
 
-network_data <- read_csv(
+network_data <- read_csv(  # read the table
   network_file,
   show_col_types = FALSE
 )
 
-standardize_names <- function(data) {
+standardize_names <- function(data) {  # define the function
 
   names(data) <- tolower(trimws(names(data)))
 
@@ -60,7 +60,7 @@ standardize_names <- function(data) {
 school_data  <- standardize_names(school_data)
 network_data <- standardize_names(network_data)
 
-standardize_column <- function(data, target_name, possible_names) {
+standardize_column <- function(data, target_name, possible_names) {  # define the function
 
   if (target_name %in% names(data)) {
     return(data)
@@ -72,7 +72,7 @@ standardize_column <- function(data, target_name, possible_names) {
   )
 
   if (length(matches) == 0) {
-    stop(
+    stop(  # stop if this check fails
       "Could not identify column: ",
       target_name,
       ". Available columns are: ",
@@ -154,16 +154,16 @@ school_data <- school_data %>%
   )
 
 if (nrow(school_data) < 2) {
-  stop("Insufficient valid schools in the school dataset.")
+  stop("Insufficient valid schools in the school dataset.")  # stop if this check fails
 }
 
 if (anyDuplicated(school_data$unit_id)) {
-  stop("Duplicate school IDs remain after cleaning.")
+  stop("Duplicate school IDs remain after cleaning.")  # stop if this check fails
 }
 
-N <- school_data$total_students
+N <- school_data$total_students  # students in each school
 
-n_school <- nrow(school_data)
+n_school <- nrow(school_data)  # number of schools
 
 school_names <- school_data$school_name
 
@@ -171,15 +171,15 @@ school_ids <- school_data$unit_id
 
 total_population <- sum(N)
 
-cat("\n============================================================\n")
-cat("SCHOOL DATA SUMMARY\n")
-cat("============================================================\n")
+cat("\n============================================================\n")  # print a check
+cat("SCHOOL DATA SUMMARY\n")  # print a check
+cat("============================================================\n")  # print a check
 
-cat("Number of schools:", n_school, "\n")
+cat("Number of schools:", n_school, "\n")  # print a check
 
-cat("Total school population:", total_population, "\n")
+cat("Total school population:", total_population, "\n")  # print a check
 
-cat(
+cat(  # print a check
   "Missing observed vaccination percentages:",
   sum(is.na(school_data$percent_immunized)),
   "\n"
@@ -207,8 +207,8 @@ network_data <- network_data %>%
 
 network_edges <- network_data %>%
   mutate(
-    node_1 = pmin(index_a, index_b),
-    node_2 = pmax(index_a, index_b)
+    node_1 = pmin(index_a, index_b),  # smaller school id first
+    node_2 = pmax(index_a, index_b)  # larger school id second
   ) %>%
   group_by(node_1, node_2) %>%
   summarise(
@@ -221,19 +221,19 @@ network_edges <- network_data %>%
   )
 
 if (nrow(network_edges) == 0) {
-  stop(
+  stop(  # stop if this check fails
     "No positive network edges remain after cleaning. ",
     "Check school IDs and connectivity weights."
   )
 }
 
-A_raw <- matrix(
+A_raw <- matrix(  # unscaled school-to-school weights
   0,
   nrow = n_school,
   ncol = n_school
 )
 
-for (k in seq_len(nrow(network_edges))) {
+for (k in seq_len(nrow(network_edges))) {  # one edge at a time
 
   i <- network_edges$node_1[k]
 
@@ -241,12 +241,12 @@ for (k in seq_len(nrow(network_edges))) {
 
   w <- network_edges$weight[k]
 
-  A_raw[i, j] <- w
+  A_raw[i, j] <- w  # undirected edge weight
 
-  A_raw[j, i] <- w
+  A_raw[j, i] <- w  # undirected edge weight
 }
 
-spectral_radius <- max(
+spectral_radius <- max(  # largest absolute eigenvalue of the network
   Mod(
     eigen(
       A_raw,
@@ -255,63 +255,63 @@ spectral_radius <- max(
   )
 )
 
-if (!is.finite(spectral_radius) || spectral_radius <= 0) {
-  stop(
+if (!is.finite(spectral_radius) || spectral_radius <= 0) {  # stop when the spectral radius is not usable
+  stop(  # stop if this check fails
     "The network has a non-positive or invalid spectral radius."
   )
 }
 
-A <- A_raw / spectral_radius
+A <- A_raw / spectral_radius  # divide every edge by the spectral radius
 
-cat("\n============================================================\n")
-cat("NETWORK SUMMARY\n")
-cat("============================================================\n")
+cat("\n============================================================\n")  # print a check
+cat("NETWORK SUMMARY\n")  # print a check
+cat("============================================================\n")  # print a check
 
-cat(
+cat(  # print a check
   "Number of positive undirected school connections:",
   nrow(network_edges),
   "\n"
 )
 
-cat(
+cat(  # print a check
   "Spectral radius before normalization:",
   spectral_radius,
   "\n"
 )
 
-seed_school_index <- 1
+seed_school_index <- 1  # school where the index case starts
 
 if (seed_school_index < 1 || seed_school_index > n_school) {
-  stop("Invalid seed school index.")
+  stop("Invalid seed school index.")  # stop if this check fails
 }
 
-gamma_rate <- 1 / 7
+gamma_rate <- 1 / 7  # recovery rate, 7-day infectious period
 
-sigma_rate <- 1 / 10
+sigma_rate <- 1 / 10  # latency rate, 10-day incubation
 
-beta_rate <- 15 * gamma_rate
+beta_rate <- 15 * gamma_rate  # within-school transmission, R0 about 15
 
-alpha <- 0.05
+alpha <- 0.05  # fraction of transmission coming from other schools
 
-simulation_times <- seq(
+simulation_times <- seq(  # days to simulate
   0,
   200,
   by = 1
 )
 
-network_seir <- function(t, state, parms) {
+network_seir <- function(t, state, parms) {  # SEIR equations for one time step
 
-  N <- parms$N
+  N <- parms$N  # students in each school
 
-  A <- parms$A
+  A <- parms$A  # adjacency matrix used in the model
 
-  beta_rate <- parms$beta_rate
+  beta_rate <- parms$beta_rate  # within-school transmission, R0 about 15
 
-  sigma_rate <- parms$sigma_rate
+  sigma_rate <- parms$sigma_rate  # latency rate, 10-day incubation
 
-  gamma_rate <- parms$gamma_rate
+  gamma_rate <- parms$gamma_rate  # recovery rate, 7-day infectious period
 
-  alpha <- parms$alpha
+  alpha <- parms$alpha  # fraction of transmission coming from other schools
 
   n <- length(N)
 
@@ -323,19 +323,19 @@ network_seir <- function(t, state, parms) {
 
   R <- state[3 * n + seq_len(n)]
 
-  infectious_fraction <- I / N
+  infectious_fraction <- I / N  # infectious fraction in each school
 
-  lambda <- beta_rate * infectious_fraction +
+  lambda <- beta_rate * infectious_fraction +  # force of infection from this school and its neighbours
     alpha * beta_rate *
     as.vector(A %*% infectious_fraction)
 
-  dS <- -lambda * S
+  dS <- -lambda * S  # infections leave the susceptible class
 
-  dE <- lambda * S - sigma_rate * E
+  dE <- lambda * S - sigma_rate * E  # new exposures minus those becoming infectious
 
-  dI <- sigma_rate * E - gamma_rate * I
+  dI <- sigma_rate * E - gamma_rate * I  # new infectious students minus recoveries
 
-  dR <- gamma_rate * I
+  dR <- gamma_rate * I  # students leaving the infectious class
 
   return(
     list(
@@ -344,7 +344,7 @@ network_seir <- function(t, state, parms) {
   )
 }
 
-run_scenario <- function(
+run_scenario <- function(  # define the function
     scenario_name,
     vax_vector,
     cutoff_val,
@@ -352,7 +352,7 @@ run_scenario <- function(
 ) {
 
   if (length(vax_vector) != n_school) {
-    stop(
+    stop(  # stop if this check fails
       "Vaccination vector length does not match the number of schools."
     )
   }
@@ -360,31 +360,31 @@ run_scenario <- function(
   if (any(!is.finite(vax_vector)) ||
       any(vax_vector < 0 | vax_vector > 1)) {
 
-    stop(
+    stop(  # stop if this check fails
       "Invalid vaccination coverage in scenario: ",
       scenario_name
     )
   }
 
-  R_init <- N * vax_vector
+  R_init <- N * vax_vector  # students already immune
 
-  E_init <- rep(
+  E_init <- rep(  # exposed at the start, usually none
     0,
     n_school
   )
 
-  I_init <- rep(
+  I_init <- rep(  # index cases at the start
     0,
     n_school
   )
 
   I_init[seed_school_index] <- 1
 
-  S_init <- N - R_init - E_init - I_init
+  S_init <- N - R_init - E_init - I_init  # students still susceptible
 
   if (any(S_init < -1e-8)) {
 
-    stop(
+    stop(  # stop if this check fails
       "Negative initial susceptible population in scenario: ",
       scenario_name,
       ". Check vaccination coverage and the seed school."
@@ -403,13 +403,13 @@ run_scenario <- function(
     )
   )) {
 
-    stop(
+    stop(  # stop if this check fails
       "Initial population conservation failed in scenario: ",
       scenario_name
     )
   }
 
-  initial_state <- c(
+  initial_state <- c(  # starting S, E, I, and R
     S_init,
     E_init,
     I_init,
@@ -433,7 +433,7 @@ run_scenario <- function(
   )
 
   simulation <- as.data.frame(
-    ode(
+    ode(  # solve the SEIR equations
       y = initial_state,
       times = simulation_times,
       func = network_seir,
@@ -574,21 +574,21 @@ summary_results <- list()
 
 time_series_data <- list()
 
-for (cutoff in cutoff_thresholds) {
+for (cutoff in cutoff_thresholds) {  # repeat for each item
 
-  cat("\n============================================================\n")
+  cat("\n============================================================\n")  # print a check
 
-  cat(
+  cat(  # print a check
     "PROCESSING SCHOOL-SIZE CUTOFF:",
     cutoff,
     "STUDENTS\n"
   )
 
-  cat("============================================================\n")
+  cat("============================================================\n")  # print a check
 
-  small_schools <- N <= cutoff
+  small_schools <- N <= cutoff  # schools with at most 700 students
 
-  large_schools <- N > cutoff
+  large_schools <- N > cutoff  # schools with more than 700 students
 
   if (sum(small_schools) == 0 ||
       sum(large_schools) == 0) {
@@ -612,25 +612,25 @@ for (cutoff in cutoff_thresholds) {
 
   pop_total <- sum(N)
 
-  cat(
+  cat(  # print a check
     "Number of small schools:",
     sum(small_schools),
     "\n"
   )
 
-  cat(
+  cat(  # print a check
     "Number of large schools:",
     sum(large_schools),
     "\n"
   )
 
-  cat(
+  cat(  # print a check
     "Small-school population:",
     pop_small,
     "\n"
   )
 
-  cat(
+  cat(  # print a check
     "Large-school population:",
     pop_large,
     "\n"
@@ -677,7 +677,7 @@ for (cutoff in cutoff_thresholds) {
       small_cov_B < 0 ||
       small_cov_B > 1) {
 
-    stop(
+    stop(  # stop if this check fails
       "Infeasible allocation at cutoff ",
       cutoff,
       ". Calculated small-school vaccination coverage is ",
@@ -708,16 +708,16 @@ for (cutoff in cutoff_thresholds) {
     )
   )) {
 
-    stop(
+    stop(  # stop if this check fails
       "Aggregate vaccination coverage does not match at cutoff ",
       cutoff,
       "."
     )
   }
 
-  cat("\nAllocation scenarios:\n")
+  cat("\nAllocation scenarios:\n")  # print a check
 
-  cat(
+  cat(  # print a check
     "Scenario A - Small schools:",
     round(small_cov_A * 100, 2),
     "%; Large schools:",
@@ -725,7 +725,7 @@ for (cutoff in cutoff_thresholds) {
     "%\n"
   )
 
-  cat(
+  cat(  # print a check
     "Scenario B - Small schools:",
     round(small_cov_B * 100, 2),
     "%; Large schools:",
@@ -733,7 +733,7 @@ for (cutoff in cutoff_thresholds) {
     "%\n"
   )
 
-  cat(
+  cat(  # print a check
     "Matched aggregate vaccination coverage:",
     round(aggregate_A * 100, 2),
     "%\n"
@@ -778,7 +778,7 @@ for (cutoff in cutoff_thresholds) {
     small_schools_vec = small_schools
   )
 
-  summary_results[[as.character(cutoff)]] <- bind_rows(
+  summary_results[[as.character(cutoff)]] <- bind_rows(  # combine these rows
 
     sc_70$summary,
 
@@ -791,7 +791,7 @@ for (cutoff in cutoff_thresholds) {
     sc_90$summary
   )
 
-  time_series_data[[as.character(cutoff)]] <- bind_rows(
+  time_series_data[[as.character(cutoff)]] <- bind_rows(  # combine these rows
 
     sc_70$time_series,
 
@@ -806,16 +806,16 @@ for (cutoff in cutoff_thresholds) {
 }
 
 if (length(summary_results) == 0) {
-  stop(
+  stop(  # stop if this check fails
     "No simulations were completed. Check the school-size cutoffs and data."
   )
 }
 
-final_table <- bind_rows(
+final_table <- bind_rows(  # combine these rows
   summary_results
 )
 
-final_ts <- bind_rows(
+final_ts <- bind_rows(  # combine these rows
   time_series_data
 )
 
@@ -864,17 +864,17 @@ final_ts <- final_ts %>%
     )
   )
 
-cat("\n\n")
+cat("\n\n")  # print a check
 
-cat("======================================================================\n")
+cat("======================================================================\n")  # print a check
 
-cat("VACCINE ALLOCATION SENSITIVITY ANALYSIS\n")
+cat("VACCINE ALLOCATION SENSITIVITY ANALYSIS\n")  # print a check
 
-cat("SCHOOL-SIZE CUTOFFS: 700, 1000, AND 1300 STUDENTS\n")
+cat("SCHOOL-SIZE CUTOFFS: 700, 1000, AND 1300 STUDENTS\n")  # print a check
 
-cat("======================================================================\n\n")
+cat("======================================================================\n\n")  # print a check
 
-print(
+print(  # show the result
   final_table,
   n = Inf,
   width = Inf
@@ -882,15 +882,15 @@ print(
 
 summary_output <- "output/tables/vaccine_allocation_threshold_summary_table.csv"
 
-write.csv(
+write.csv(  # save the table
   final_table,
   summary_output,
   row.names = FALSE
 )
 
-cat("\nSummary table exported to:\n")
+cat("\nSummary table exported to:\n")  # print a check
 
-cat(
+cat(  # print a check
   normalizePath(
     summary_output,
     mustWork = FALSE
@@ -933,7 +933,7 @@ strategy_linetypes <- c(
   "Uniform 90%"    = "solid"
 )
 
-p_epidemic_curves <- ggplot(
+p_epidemic_curves <- ggplot(  # start the plot
   final_ts,
   aes(
     x = time,
@@ -943,8 +943,8 @@ p_epidemic_curves <- ggplot(
     group = Scenario
   )
 ) +
-  geom_line(linewidth = 1.1) +
-  facet_wrap(
+  geom_line(linewidth = 1.1) +  # draw the time series
+  facet_wrap(  # one panel per group
     ~Cutoff,
     ncol = 3
   ) +
@@ -953,13 +953,13 @@ p_epidemic_curves <- ggplot(
     values = strategy_colours
   ) +
   scale_linetype_identity() +
-  labs(
+  labs(  # titles and axis labels
     title = "Measles Epidemic Curves Across School-Size Cutoffs",
     subtitle = "Comparison of vaccination allocation strategies with matched aggregate coverage",
     x = "Time (Days)",
     y = "Number of Infectious Students"
   ) +
-  theme_minimal() +
+  theme_minimal() +  # plain plot theme
   theme(
     plot.title = element_text(face = "bold", size = 13),
     plot.subtitle = element_text(size = 10),
@@ -975,4 +975,4 @@ p_epidemic_curves <- ggplot(
     panel.grid.minor = element_blank()
   )
 
-print(p_epidemic_curves)
+print(p_epidemic_curves)  # show the result

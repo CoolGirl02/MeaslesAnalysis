@@ -1,13 +1,13 @@
-for (group_name in names(analysis_groups)) {
+for (group_name in names(analysis_groups)) {  # repeat for each item
 
   selected_ids <- analysis_groups[[group_name]]
 
   if (length(selected_ids) == 0) {
-    cat("\nNo schools selected for:", group_name, "\n")
+    cat("\nNo schools selected for:", group_name, "\n")  # print a check
     next
   }
 
-  page_data <- results_long %>%
+  page_data <- results_long %>%  # schools drawn on this page
     filter(
       school_id %in% selected_ids,
       Compartment != "R"
@@ -17,7 +17,7 @@ for (group_name in names(analysis_groups)) {
     ) %>%
     arrange(plot_order)
 
-  p_plot <- ggplot(
+  p_plot <- ggplot(  # start the plot
     page_data,
     aes(
       x = time,
@@ -27,9 +27,9 @@ for (group_name in names(analysis_groups)) {
     )
   ) +
 
-    geom_line(linewidth = 0.8) +
+    geom_line(linewidth = 0.8) +  # draw the time series
 
-    scale_color_manual(
+    scale_color_manual(  # set the legend colours or line types
       values = c(
         "S" = "blue",
         "E" = "orange",
@@ -43,7 +43,7 @@ for (group_name in names(analysis_groups)) {
       )
     ) +
 
-    scale_linetype_manual(
+    scale_linetype_manual(  # set the legend colours or line types
       values = c(
         "S" = "solid",
         "E" = "dashed",
@@ -57,7 +57,7 @@ for (group_name in names(analysis_groups)) {
       )
     ) +
 
-    facet_wrap(
+    facet_wrap(  # one panel per group
       ~school_label,
       ncol = 3,
       scales = "free_y"
@@ -68,7 +68,7 @@ for (group_name in names(analysis_groups)) {
       expand = expansion(mult = c(0, 0.05))
     ) +
 
-    labs(
+    labs(  # titles and axis labels
       title = paste0(
         group_name,
         "\nInfection introduced at ",
@@ -80,7 +80,7 @@ for (group_name in names(analysis_groups)) {
       linetype = "Compartment"
     ) +
 
-    theme_minimal() +
+    theme_minimal() +  # plain plot theme
 
     theme(
       strip.text = element_text(size = 8, face = "bold"),
@@ -88,7 +88,7 @@ for (group_name in names(analysis_groups)) {
       plot.title = element_text(face = "bold")
     )
 
-  print(p_plot)
+  print(p_plot)  # show the result
 }
 
-cat("\nAll five grouped school plots have been generated.\n")
+cat("\nAll five grouped school plots have been generated.\n")  # print a check

@@ -1,6 +1,6 @@
-df <- read.csv("data/raw/spartanburg_connectivity_data.csv")
+df <- read.csv("data/raw/spartanburg_connectivity_data.csv")  # read the table
 
-library(dplyr)
+library(dplyr)  # data wrangling
 
 df_1 <- df %>%
   select(unit_id_A, school_name_A, school_long_A, school_lat_A, MMR_PR_A ) %>%
@@ -28,15 +28,15 @@ df_2 <- df_2 %>%
     MMR_PR = MMR_PR_B
   )
 
-final_schools_data <- bind_rows(df_1, df_2)
-final_schools_data <- final_schools_data %>%
+final_schools_data <- bind_rows(df_1, df_2)  # unique schools from both ends of each edge
+final_schools_data <- final_schools_data %>%  # unique schools from both ends of each edge
   distinct()
 
-network_df <- df %>%
+network_df <- df %>%  # one row per undirected school pair
   select(unit_id_A, unit_id_B, total_contacts, connect_risk)%>%
   mutate(
-    node1 = pmin(unit_id_A, unit_id_B),
-    node2 = pmax(unit_id_A, unit_id_B)
+    node1 = pmin(unit_id_A, unit_id_B),  # smaller school id first
+    node2 = pmax(unit_id_A, unit_id_B)  # larger school id second
   ) %>%
 
   mutate(
@@ -51,15 +51,15 @@ duplicated_rows <- network_df %>%
   filter(n() > 1) %>%
   ungroup()
 
-library(igraph)
+library(igraph)  # network tools
 edges <-network_df %>%
   select(unit_id_A, unit_id_B)
 
-net <- graph_from_data_frame(edges, directed = FALSE)
+net <- graph_from_data_frame(edges, directed = FALSE)  # build an undirected school network
 
 par(mar = c(0, 0, 0, 0))
 
-l <- layout_with_fr(net)
+l <- layout_with_fr(net)  # place the schools for the plot
 
 plot(
   net,

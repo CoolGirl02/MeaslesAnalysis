@@ -1,11 +1,11 @@
-library(tidyverse)
-library(igraph)
-library(ggraph)
+library(tidyverse)  # data wrangling and plots
+library(igraph)  # network tools
+library(ggraph)  # network plots
 
-school_data  <- read_csv("data/processed/school_data_joined.csv", show_col_types = FALSE) %>%
+school_data  <- read_csv("data/processed/school_data_joined.csv", show_col_types = FALSE) %>%  # read the table
   rename_with(tolower)
 
-network_data <- read_csv("data/processed/network_df.csv", show_col_types = FALSE) %>%
+network_data <- read_csv("data/processed/network_df.csv", show_col_types = FALSE) %>%  # read the table
   rename_with(tolower)
 
 node_data <- school_data %>%
@@ -25,9 +25,9 @@ edge_data <- network_data %>%
   filter(unit_id_a %in% node_data$unit_id & unit_id_b %in% node_data$unit_id) %>%
   relocate(unit_id_a, unit_id_b, .before = 1)
 
-net <- graph_from_data_frame(d = edge_data, vertices = node_data, directed = FALSE)
+net <- graph_from_data_frame(d = edge_data, vertices = node_data, directed = FALSE)  # build an undirected school network
 
-p_geo_halo <- ggraph(net, layout = layout_geo) +
+p_geo_halo <- ggraph(net, layout = layout_geo) +  # place the schools for the plot
 
   geom_edge_link(
     color = "gray75",
@@ -35,7 +35,7 @@ p_geo_halo <- ggraph(net, layout = layout_geo) +
     width = 0.4
   ) +
 
-  geom_node_point(
+  geom_node_point(  # one mark per school
     aes(
       fill  = herd_immunity,
       color = exposure_halo
@@ -45,7 +45,7 @@ p_geo_halo <- ggraph(net, layout = layout_geo) +
     stroke = 1.8
   ) +
 
-  scale_fill_manual(
+  scale_fill_manual(  # set the legend colours or line types
     values = c(
       "Below 95% MMR" = "#E41A1C",
       "95%+ MMR"      = "#2CA02C"
@@ -53,7 +53,7 @@ p_geo_halo <- ggraph(net, layout = layout_geo) +
     name = "Herd Immunity Status"
   ) +
 
-  scale_color_manual(
+  scale_color_manual(  # set the legend colours or line types
     values = c(
       "Exposed School"   = "#00BFFF",
       "Unexposed School" = "#444444"
@@ -69,7 +69,7 @@ p_geo_halo <- ggraph(net, layout = layout_geo) +
   ) +
 
   theme_graph(base_family = "sans") +
-  labs(
+  labs(  # titles and axis labels
     title = "Geographic Network Plot (Spartanburg County)"
   ) +
   theme(
@@ -78,4 +78,4 @@ p_geo_halo <- ggraph(net, layout = layout_geo) +
     plot.subtitle = element_text(size = 10, hjust = 0.5)
   )
 
-print(p_geo_halo)
+print(p_geo_halo)  # show the result

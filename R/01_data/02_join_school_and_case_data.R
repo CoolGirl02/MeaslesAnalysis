@@ -1,6 +1,6 @@
-library(tidyverse)
+library(tidyverse)  # data wrangling and plots
 
-df <- read_csv(
+df <- read_csv(  # read the table
   "data/raw/schools_vax_geocoded_25_26_withdates.csv",
   col_types = cols(total_students = col_character()),
   show_col_types = FALSE
@@ -12,7 +12,7 @@ df_1 <- df %>%
   mutate(
 
     total_students = case_when(
-      total_students == "<10" ~ 9L,
+      total_students == "<10" ~ 9L,  # treat enrolment under 10 as 9
       total_students == ""    ~ NA_integer_,
       TRUE                    ~ suppressWarnings(as.integer(total_students))
     ),
@@ -23,25 +23,25 @@ df_1 <- df %>%
       total_students
     ),
 
-    n_cases = if_else(is.na(n_cases), 0, n_cases)
+    n_cases = if_else(is.na(n_cases), 0, n_cases)  # missing case counts become zero
   )
 
-df_filtered <- df_1 %>%
-  filter(county == "spartanburg")
+df_filtered <- df_1 %>%  # Spartanburg schools only
+  filter(county == "spartanburg")  # keep Spartanburg schools
 
-df_left <- read_csv("data/processed/schools_data.csv", show_col_types = FALSE) %>%
+df_left <- read_csv("data/processed/schools_data.csv", show_col_types = FALSE) %>%  # read the table
   select(school_name, unit_Id)
 
-df_final <- right_join(df_left, df_filtered, by = "school_name", suffix = c("_left", "_right")) %>%
+df_final <- right_join(df_left, df_filtered, by = "school_name", suffix = c("_left", "_right")) %>%  # schools that have both coverage and a network id
   filter(!is.na(unit_Id))
 
-write_csv(df_final, "data/processed/school_data_joined.csv")
+write_csv(df_final, "data/processed/school_data_joined.csv")  # save the table
 
-df_cases <- read_csv("data/raw/SC_cases_by_week.csv", show_col_types = FALSE)
+df_cases <- read_csv("data/raw/SC_cases_by_week.csv", show_col_types = FALSE)  # weekly incident and cumulative cases
 
-df_cases$date <- as.Date(df_cases$date, format = "%m/%d/%Y")
+df_cases$date <- as.Date(df_cases$date, format = "%m/%d/%Y")  # parse the dates
 
-write_csv(df_cases, "data/processed/cases_counts.csv")
+write_csv(df_cases, "data/processed/cases_counts.csv")  # save the table
 
 plot(
   df_cases$date, df_cases$cum_cases,

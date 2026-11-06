@@ -1,18 +1,18 @@
-suppressPackageStartupMessages({
-  library(tidyverse)
-  library(deSolve)
-  library(igraph)
+suppressPackageStartupMessages({  # load packages quietly
+  library(tidyverse)  # data wrangling and plots
+  library(deSolve)  # ODE solver
+  library(igraph)  # network tools
 })
 
 if (!exists("df")) {
-  stop(
+  stop(  # stop if this check fails
     "The school data object 'df' does not exist. ",
     "Please load and prepare your school data first."
   )
 }
 
 if (!exists("A")) {
-  stop(
+  stop(  # stop if this check fails
     "The adjacency matrix 'A' does not exist. ",
     "Please create the network adjacency matrix first."
   )
@@ -25,7 +25,7 @@ required_columns <- c("total_students", "vax_rate")
 missing_columns <- setdiff(required_columns, names(df))
 
 if (length(missing_columns) > 0) {
-  stop(
+  stop(  # stop if this check fails
     "Missing required columns in df: ",
     paste(missing_columns, collapse = ", ")
   )
@@ -37,13 +37,13 @@ df$vax_rate <- as.numeric(df$vax_rate)
 if (any(is.na(df$total_students)) ||
     any(!is.finite(df$total_students)) ||
     any(df$total_students <= 0)) {
-  stop("total_students must contain positive, finite values.")
+  stop("total_students must contain positive, finite values.")  # stop if this check fails
 }
 
 if (any(is.na(df$vax_rate)) ||
     any(!is.finite(df$vax_rate)) ||
     any(df$vax_rate < 0 | df$vax_rate > 1)) {
-  stop(
+  stop(  # stop if this check fails
     "vax_rate must contain proportions between 0 and 1. ",
     "For example, use 0.90 for 90% coverage, not 90."
   )
@@ -51,103 +51,103 @@ if (any(is.na(df$vax_rate)) ||
 
 n <- nrow(df)
 
-cat("Number of schools:", n, "\n")
+cat("Number of schools:", n, "\n")  # print a check
 
-A <- as.matrix(A)
+A <- as.matrix(A)  # adjacency matrix used in the model
 
 storage.mode(A) <- "numeric"
 
 if (nrow(A) != n || ncol(A) != n) {
-  stop(
+  stop(  # stop if this check fails
     "The adjacency matrix must have the same number of rows and columns ",
     "as the number of schools in df."
   )
 }
 
 if (any(!is.finite(A))) {
-  stop("The adjacency matrix contains missing or non-finite values.")
+  stop("The adjacency matrix contains missing or non-finite values.")  # stop if this check fails
 }
 
 if (any(A < 0)) {
-  stop("The adjacency matrix cannot contain negative values.")
+  stop("The adjacency matrix cannot contain negative values.")  # stop if this check fails
 }
 
 diag(A) <- 0
 
 if (all(A == 0)) {
-  stop("The adjacency matrix contains no inter-school connections.")
+  stop("The adjacency matrix contains no inter-school connections.")  # stop if this check fails
 }
 
 spectral_radius_before <- max(
   Mod(eigen(A, only.values = TRUE)$values)
 )
 
-if (!is.finite(spectral_radius_before) ||
+if (!is.finite(spectral_radius_before) ||  # stop when the spectral radius is not usable
     spectral_radius_before <= 0) {
-  stop("The spectral radius must be positive.")
+  stop("The spectral radius must be positive.")  # stop if this check fails
 }
 
-A <- A / spectral_radius_before
+A <- A / spectral_radius_before  # divide every edge by the spectral radius
 
 spectral_radius_after <- max(
   Mod(eigen(A, only.values = TRUE)$values)
 )
 
-cat("\nNETWORK NORMALIZATION\n")
-cat("---------------------\n")
-cat(
+cat("\nNETWORK NORMALIZATION\n")  # print a check
+cat("---------------------\n")  # print a check
+cat(  # print a check
   "Spectral radius before normalization:",
   spectral_radius_before, "\n"
 )
-cat(
+cat(  # print a check
   "Spectral radius after normalization:",
   spectral_radius_after, "\n"
 )
 
-gamma <- 1 / 7
-sigma <- 1 / 10
+gamma <- 1 / 7  # recovery rate, 7-day infectious period
+sigma <- 1 / 10  # latency rate, 10-day incubation
 
 R0_target <- 15
-beta <- R0_target * gamma
+beta <- R0_target * gamma  # within-school transmission rate
 
-alpha_0 <- 0.05
+alpha_0 <- 0.05  # baseline between-school coupling
 
 t_star <- 14
 
-times <- seq(0, 200, by = 1)
+times <- seq(0, 200, by = 1)  # days to simulate
 
-cat("\nMODEL PARAMETERS\n")
-cat("----------------\n")
-cat("Transmission rate beta:", beta, "\n")
-cat("Progression rate sigma:", sigma, "\n")
-cat("Recovery rate gamma:", gamma, "\n")
-cat("Baseline inter-school multiplier:", alpha_0, "\n")
-cat("Restrictions begin on day:", t_star, "\n")
+cat("\nMODEL PARAMETERS\n")  # print a check
+cat("----------------\n")  # print a check
+cat("Transmission rate beta:", beta, "\n")  # print a check
+cat("Progression rate sigma:", sigma, "\n")  # print a check
+cat("Recovery rate gamma:", gamma, "\n")  # print a check
+cat("Baseline inter-school multiplier:", alpha_0, "\n")  # print a check
+cat("Restrictions begin on day:", t_star, "\n")  # print a check
 
-N <- df$total_students
+N <- df$total_students  # students in each school
 
 R_vax <- round(N * df$vax_rate)
 
-E0 <- rep(0, n)
+E0 <- rep(0, n)  # exposed at the start, usually none
 
-I0 <- rep(0, n)
+I0 <- rep(0, n)  # index cases at the start
 
-seed_school_id <- 1
+seed_school_id <- 1  # school where the index case starts
 
 if (seed_school_id < 1 || seed_school_id > n) {
-  stop("The seed school index is outside the range of available schools.")
+  stop("The seed school index is outside the range of available schools.")  # stop if this check fails
 }
 
 I0[seed_school_id] <- 1
 
-cat("\nINITIAL INFECTION\n")
-cat("-----------------\n")
-cat("Infection starts in school number:", seed_school_id, "\n")
+cat("\nINITIAL INFECTION\n")  # print a check
+cat("-----------------\n")  # print a check
+cat("Infection starts in school number:", seed_school_id, "\n")  # print a check
 
-S0 <- N - R_vax - I0
+S0 <- N - R_vax - I0  # students still susceptible
 
 if (any(S0 < 0)) {
-  stop(
+  stop(  # stop if this check fails
     "Some schools have negative initial susceptible populations. ",
     "Check vaccination coverage, school populations, and the initial infection."
   )
@@ -160,7 +160,7 @@ E_names <- paste0("E", seq_len(n))
 I_names <- paste0("I", seq_len(n))
 R_names <- paste0("R", seq_len(n))
 
-initial_state <- c(
+initial_state <- c(  # starting S, E, I, and R
   S0,
   E0,
   I0,
@@ -174,14 +174,14 @@ names(initial_state) <- c(
   R_names
 )
 
-network_seir_model <- function(time, state, parms) {
+network_seir_model <- function(time, state, parms) {  # SEIR equations for one time step
 
-  N <- parms$N
-  A <- parms$A
-  beta <- parms$beta
-  sigma <- parms$sigma
-  gamma <- parms$gamma
-  alpha_0 <- parms$alpha_0
+  N <- parms$N  # students in each school
+  A <- parms$A  # adjacency matrix used in the model
+  beta <- parms$beta  # within-school transmission rate
+  sigma <- parms$sigma  # latency rate, 10-day incubation
+  gamma <- parms$gamma  # recovery rate, 7-day infectious period
+  alpha_0 <- parms$alpha_0  # baseline between-school coupling
   t_star <- parms$t_star
   r_factor <- parms$r_factor
 
@@ -198,17 +198,17 @@ network_seir_model <- function(time, state, parms) {
     current_alpha <- alpha_0 * r_factor
   }
 
-  I_prop <- I / N
+  I_prop <- I / N  # infectious fraction in each school
 
-  lambda <- (beta * I_prop) +
+  lambda <- (beta * I_prop) +  # force of infection from this school and its neighbours
     (current_alpha * beta * as.vector(A %*% I_prop))
 
-  lambda <- pmax(lambda, 0)
+  lambda <- pmax(lambda, 0)  # force of infection from this school and its neighbours
 
-  dS <- -lambda * S
-  dE <- lambda * S - sigma * E
-  dI <- sigma * E - gamma * I
-  dR <- gamma * I
+  dS <- -lambda * S  # infections leave the susceptible class
+  dE <- lambda * S - sigma * E  # new exposures minus those becoming infectious
+  dI <- sigma * E - gamma * I  # new infectious students minus recoveries
+  dR <- gamma * I  # students leaving the infectious class
 
   names(dS) <- paste0("S", seq_len(n))
   names(dE) <- paste0("E", seq_len(n))
@@ -218,9 +218,9 @@ network_seir_model <- function(time, state, parms) {
   list(c(dS, dE, dI, dR))
 }
 
-run_r_scenario_full <- function(r_factor) {
+run_r_scenario_full <- function(r_factor) {  # define the function
 
-  parms <- list(
+  parms <- list(  # parameters passed into the solver
     N = N,
     A = A,
     beta = beta,
@@ -305,12 +305,12 @@ scenario_runs <- lapply(
   run_r_scenario_full
 )
 
-results_df <- bind_rows(
-  lapply(scenario_runs, function(x) x$summary)
+results_df <- bind_rows(  # combine these rows
+  lapply(scenario_runs, function(x) x$summary)  # define the function
 )
 
-sens8_df <- bind_rows(
-  lapply(scenario_runs, function(x) x$curve)
+sens8_df <- bind_rows(  # combine these rows
+  lapply(scenario_runs, function(x) x$curve)  # define the function
 )
 
 baseline_cases <- results_df$Total_New_Cases[
@@ -318,7 +318,7 @@ baseline_cases <- results_df$Total_New_Cases[
 ]
 
 if (length(baseline_cases) != 1 || baseline_cases <= 0) {
-  stop(
+  stop(  # stop if this check fails
     "The no-restriction scenario must produce a positive number of cases ",
     "to calculate percentage case reductions."
   )
@@ -351,18 +351,18 @@ maximum_pre_restriction_difference <- max(
   na.rm = TRUE
 )
 
-cat("\nPRE-RESTRICTION CHECK\n")
-cat("---------------------\n")
-cat(
+cat("\nPRE-RESTRICTION CHECK\n")  # print a check
+cat("---------------------\n")  # print a check
+cat(  # print a check
   "Maximum difference in total infectious students before day",
   t_star, ":",
   maximum_pre_restriction_difference, "\n"
 )
 
 if (maximum_pre_restriction_difference < 1e-6) {
-  cat("CHECK PASSED: Scenarios are identical before day 14.\n")
+  cat("CHECK PASSED: Scenarios are identical before day 14.\n")  # print a check
 } else {
-  cat(
+  cat(  # print a check
     "WARNING: Scenarios differ before day 14. ",
     "Check the model implementation.\n"
   )
@@ -393,10 +393,10 @@ results_table <- results_df %>%
     )
   )
 
-cat("\nSENSITIVITY ANALYSIS RESULTS\n")
-cat("============================\n")
+cat("\nSENSITIVITY ANALYSIS RESULTS\n")  # print a check
+cat("============================\n")  # print a check
 
-print(results_table, n = Inf)
+print(results_table, n = Inf)  # show the result
 
 elasticity_df <- tibble(
   From_Factor = c(1.0, 0.5),
@@ -431,10 +431,10 @@ elasticity_df <- tibble(
   ) %>%
   ungroup()
 
-cat("\nELASTICITY BETWEEN CONNECTIVITY SCENARIOS\n")
-cat("=========================================\n")
+cat("\nELASTICITY BETWEEN CONNECTIVITY SCENARIOS\n")  # print a check
+cat("=========================================\n")  # print a check
 
-print(
+print(  # show the result
   elasticity_df %>%
     mutate(
       Percentage_Change_Cases = round(
@@ -448,7 +448,7 @@ print(
   n = Inf
 )
 
-p_infectious <- ggplot(
+p_infectious <- ggplot(  # start the plot
   sens8_df,
   aes(
     x = time,
@@ -456,16 +456,16 @@ p_infectious <- ggplot(
     color = Scenario
   )
 ) +
-  geom_line(linewidth = 1.2) +
+  geom_line(linewidth = 1.2) +  # draw the time series
 
-  geom_vline(
+  geom_vline(  # mark the threshold
     xintercept = t_star,
     linetype = "dashed",
     color = "black",
     linewidth = 0.8
   ) +
 
-  annotate(
+  annotate(  # label the reference line
     "text",
     x = t_star + 3,
     y = max(sens8_df$Total_Infectious, na.rm = TRUE) * 0.95,
@@ -474,7 +474,7 @@ p_infectious <- ggplot(
     color = "black"
   ) +
 
-  scale_color_manual(
+  scale_color_manual(  # set the legend colours or line types
     values = c(
       "No reduction" = "#0072B2",
       "50% reduction" = "#D55E00",
@@ -487,7 +487,7 @@ p_infectious <- ggplot(
     )
   ) +
 
-  labs(
+  labs(  # titles and axis labels
     title = "Effect of Inter-School Travel Restrictions on Measles Transmission",
     subtitle = paste0("Restrictions begin on day ", t_star),
     x = "Time (days)",
@@ -495,15 +495,15 @@ p_infectious <- ggplot(
     color = "Connectivity scenario"
   ) +
 
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 12) +  # plain plot theme
   theme(
     legend.position = "bottom",
     plot.title = element_text(face = "bold")
   )
 
-print(p_infectious)
+print(p_infectious)  # show the result
 
-ggsave(
+ggsave(  # save the figure
   filename = "figures/sensitivity/sensitivity_analysis_3_infectious_curves.png",
   plot = p_infectious,
   width = 10,
@@ -511,7 +511,7 @@ ggsave(
   dpi = 300
 )
 
-p_cases <- ggplot(
+p_cases <- ggplot(  # start the plot
   results_df,
   aes(
     x = factor(
@@ -525,26 +525,26 @@ p_cases <- ggplot(
     y = Total_New_Cases
   )
 ) +
-  geom_col() +
+  geom_col() +  # bar lengths show the values
   geom_text(
     aes(label = round(Total_New_Cases)),
     vjust = -0.4,
     size = 4
   ) +
-  labs(
+  labs(  # titles and axis labels
     title = "Total New Measles Cases Under Different Connectivity Scenarios",
     x = "Inter-school connectivity scenario",
     y = "Total new cases"
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 12) +  # plain plot theme
   theme(
     plot.title = element_text(face = "bold"),
     axis.text.x = element_text(angle = 15, hjust = 1)
   )
 
-print(p_cases)
+print(p_cases)  # show the result
 
-p_reduction <- ggplot(
+p_reduction <- ggplot(  # start the plot
   results_df,
   aes(
     x = factor(
@@ -558,7 +558,7 @@ p_reduction <- ggplot(
     y = Percentage_Case_Reduction
   )
 ) +
-  geom_col() +
+  geom_col() +  # bar lengths show the values
   geom_text(
     aes(label = paste0(
       round(Percentage_Case_Reduction, 2),
@@ -567,44 +567,44 @@ p_reduction <- ggplot(
     vjust = -0.4,
     size = 4
   ) +
-  labs(
+  labs(  # titles and axis labels
     title = "Percentage Reduction in Cases Compared with No Restrictions",
     x = "Inter-school connectivity scenario",
     y = "Reduction in total new cases (%)"
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 12) +  # plain plot theme
   theme(
     plot.title = element_text(face = "bold"),
     axis.text.x = element_text(angle = 15, hjust = 1)
   )
 
-print(p_reduction)
+print(p_reduction)  # show the result
 
-write.csv(
+write.csv(  # save the table
   results_df,
   "output/tables/sensitivity_analysis_3_results.csv",
   row.names = FALSE
 )
 
-write.csv(
+write.csv(  # save the table
   sens8_df,
   "output/tables/sensitivity_analysis_3_infectious_curves.csv",
   row.names = FALSE
 )
 
-write.csv(
+write.csv(  # save the table
   elasticity_df,
   "output/tables/sensitivity_analysis_3_elasticity.csv",
   row.names = FALSE
 )
 
-write.csv(
+write.csv(  # save the table
   pre_restriction_check,
   "output/tables/sensitivity_analysis_3_pre_restriction_check.csv",
   row.names = FALSE
 )
 
-ggsave(
+ggsave(  # save the figure
   "figures/sensitivity/sensitivity_analysis_3_infectious_curves.png",
   plot = p_infectious,
   width = 10,
@@ -612,7 +612,7 @@ ggsave(
   dpi = 300
 )
 
-ggsave(
+ggsave(  # save the figure
   "figures/sensitivity/sensitivity_analysis_3_total_cases.png",
   plot = p_cases,
   width = 9,
@@ -620,7 +620,7 @@ ggsave(
   dpi = 300
 )
 
-ggsave(
+ggsave(  # save the figure
   "figures/sensitivity/sensitivity_analysis_3_case_reduction.png",
   plot = p_reduction,
   width = 9,
@@ -628,14 +628,14 @@ ggsave(
   dpi = 300
 )
 
-cat("\nANALYSIS COMPLETE\n")
-cat("=================\n")
-cat("The three connectivity scenarios have been simulated.\n")
-cat("The infection starts in the first school.\n")
-cat("The adjacency matrix was normalized by its spectral radius.\n")
-cat("Connectivity restrictions begin on day 14.\n")
-cat(
+cat("\nANALYSIS COMPLETE\n")  # print a check
+cat("=================\n")  # print a check
+cat("The three connectivity scenarios have been simulated.\n")  # print a check
+cat("The infection starts in the first school.\n")  # print a check
+cat("The adjacency matrix was normalized by its spectral radius.\n")  # print a check
+cat("Connectivity restrictions begin on day 14.\n")  # print a check
+cat(  # print a check
   "Total new cases were calculated using susceptible depletion:\n",
   "C(T) = sum_i [S_i(0) - S_i(T)].\n"
 )
-cat("Results tables and plots have been saved to the working directory.\n")
+cat("Results tables and plots have been saved to the working directory.\n")  # print a check

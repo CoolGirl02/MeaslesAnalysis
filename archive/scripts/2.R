@@ -15,7 +15,7 @@ vax_configs <- tibble(
 comparison_all_list <- list()
 results_table_list  <- list()
 
-for (i in seq_len(nrow(pair_combinations))) {
+for (i in seq_len(nrow(pair_combinations))) {  # one school at a time
 
   pair_label <- pair_combinations$Pair_Label[i]
   h_id       <- pair_combinations$Hub_ID[i]
@@ -23,7 +23,7 @@ for (i in seq_len(nrow(pair_combinations))) {
   h_name     <- pair_combinations$Hub_Name[i]
   p_name     <- pair_combinations$Peri_Name[i]
 
-  for (j in seq_len(nrow(vax_configs))) {
+  for (j in seq_len(nrow(vax_configs))) {  # repeat for each item
 
     c_name <- vax_configs$Config_Name[j]
     v_val  <- vax_configs$vax_val[j]
@@ -38,7 +38,7 @@ for (i in seq_len(nrow(pair_combinations))) {
     out_hub  <- run_vax_scenario(vax_current, h_id)
     out_peri <- run_vax_scenario(vax_current, p_id)
 
-    ts_combined <- bind_rows(
+    ts_combined <- bind_rows(  # combine these rows
       get_total_I(out_hub,  c_name, "Network Hub", h_name),
       get_total_I(out_peri, c_name, "Peripheral", p_name)
     ) %>%
@@ -62,15 +62,15 @@ for (i in seq_len(nrow(pair_combinations))) {
   }
 }
 
-plot_data_3x3 <- bind_rows(comparison_all_list) %>%
+plot_data_3x3 <- bind_rows(comparison_all_list) %>%  # combine these rows
   mutate(
     Scenario = factor(Scenario, levels = vax_configs$Config_Name),
     Pair     = factor(Pair, levels = pair_combinations$Pair_Label)
   )
 
-table_3x3_summary <- bind_rows(results_table_list)
+table_3x3_summary <- bind_rows(results_table_list)  # combine these rows
 
-p_3x3_grid <- ggplot(
+p_3x3_grid <- ggplot(  # start the plot
   plot_data_3x3,
   aes(
     x = time,
@@ -79,28 +79,28 @@ p_3x3_grid <- ggplot(
     linetype = `Seed Type`
   )
 ) +
-  geom_line(linewidth = 1.1) +
+  geom_line(linewidth = 1.1) +  # draw the time series
 
-  facet_grid(
+  facet_grid(  # one panel per group
     Pair ~ Scenario,
     scales = "free_y"
   ) +
 
-  scale_color_manual(
+  scale_color_manual(  # set the legend colours or line types
     values = c(
       "Network Hub" = "firebrick",
       "Peripheral"  = "darkblue"
     )
   ) +
 
-  scale_linetype_manual(
+  scale_linetype_manual(  # set the legend colours or line types
     values = c(
       "Network Hub" = "solid",
       "Peripheral"  = "solid"
     )
   ) +
 
-  labs(
+  labs(  # titles and axis labels
     title = "Epidemic Curves by Hub-Peripheral Pairs Across Coverage Scenarios",
     subtitle = "Comparing trajectories of the top 3 Hubs vs bottom 3 Peripherals across 3 vaccination strategies",
     x = "Days Since Outbreak Introduction",
@@ -109,7 +109,7 @@ p_3x3_grid <- ggplot(
     linetype = "Seed Category"
   ) +
 
-  theme_minimal() +
+  theme_minimal() +  # plain plot theme
   theme(
     legend.position = "bottom",
     strip.text = element_text(face = "bold", size = 10),
@@ -118,10 +118,10 @@ p_3x3_grid <- ggplot(
     plot.title = element_text(face = "bold", size = 12)
   )
 
-print(p_3x3_grid)
+print(p_3x3_grid)  # show the result
 
-cat("\n\n============================================================\n")
-cat("SUMMARY TABLE: 9-PANEL SENSITIVITY ANALYSIS\n")
-cat("============================================================\n\n")
+cat("\n\n============================================================\n")  # print a check
+cat("SUMMARY TABLE: 9-PANEL SENSITIVITY ANALYSIS\n")  # print a check
+cat("============================================================\n\n")  # print a check
 
-print(table_3x3_summary, n = Inf)
+print(table_3x3_summary, n = Inf)  # show the result

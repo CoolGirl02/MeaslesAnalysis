@@ -1,11 +1,11 @@
-library(tidyverse)
-library(deSolve)
+library(tidyverse)  # data wrangling and plots
+library(deSolve)  # ODE solver
 
-df <- read.csv("data/processed/school_data_joined.csv")
+df <- read.csv("data/processed/school_data_joined.csv")  # read the table
 
 names(df) <- tolower(names(df))
 
-if (!"unit_id" %in% names(df)) {
+if (!"unit_id" %in% names(df)) {  # add a school id if the column is missing
   df$unit_id <- as.character(1:nrow(df))
 } else {
   df$unit_id <- as.character(df$unit_id)
@@ -13,19 +13,19 @@ if (!"unit_id" %in% names(df)) {
 
 df <- df %>%
   mutate(
-    vax_rate = if_else(percent_immunized > 1, percent_immunized / 100, percent_immunized),
-    school_id = row_number(),
-    page = ceiling(school_id / 6)
+    vax_rate = if_else(percent_immunized > 1, percent_immunized / 100, percent_immunized),  # values above 1 are percentages, so divide by 100
+    school_id = row_number(),  # index the schools
+    page = ceiling(school_id / 6)  # six schools per figure
   )
 
-n_schools <- nrow(df)
+n_schools <- nrow(df)  # number of schools
 
-net_df <- read.csv("data/processed/network_df.csv")
+net_df <- read.csv("data/processed/network_df.csv")  # read the table
 names(net_df) <- tolower(names(net_df))
 
 id_cols <- names(net_df)[grep("unit|from|to|source|target|id", names(net_df))]
 
-if (length(id_cols) >= 2) {
+if (length(id_cols) >= 2) {  # use the columns that name the two schools
   net_df <- net_df %>%
     rename(
       unit_id_a = !!sym(id_cols[1]),
@@ -42,37 +42,37 @@ net_df <- net_df %>%
   )
 
 id_map <- setNames(1:n_schools, df$unit_id)
-A      <- matrix(0, nrow = n_schools, ncol = n_schools)
+A      <- matrix(0, nrow = n_schools, ncol = n_schools)  # adjacency matrix used in the model
 
-for (k in 1:nrow(net_df)) {
+for (k in 1:nrow(net_df)) {  # one edge at a time
   i <- id_map[net_df$unit_id_a[k]]
   j <- id_map[net_df$unit_id_b[k]]
-  if (!is.na(i) && !is.na(j)) {
+  if (!is.na(i) && !is.na(j)) {  # keep the edge only if both schools are in the table
     w <- if("connect_risk" %in% names(net_df)) net_df$connect_risk[k] else 1
-    A[i, j] <- w
-    A[j, i] <- w
+    A[i, j] <- w  # undirected edge weight
+    A[j, i] <- w  # undirected edge weight
   }
 }
 
-spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))
-if (!is.finite(spectral_radius) || spectral_radius <= 0) {
-  stop("The network spectral radius is zero or invalid.")
+spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))  # largest absolute eigenvalue of the network
+if (!is.finite(spectral_radius) || spectral_radius <= 0) {  # stop when the spectral radius is not usable
+  stop("The network spectral radius is zero or invalid.")  # stop if this check fails
 }
-A <- A / spectral_radius
+A <- A / spectral_radius  # divide every edge by the spectral radius
 
-gamma_rate <- 1 / 7
-sigma_rate <- 1 / 10
-beta_rate  <- 15 * gamma_rate
-alpha      <- 0.05
-times      <- seq(0, 200, by = 1)
+gamma_rate <- 1 / 7  # recovery rate, 7-day infectious period
+sigma_rate <- 1 / 10  # latency rate, 10-day incubation
+beta_rate  <- 15 * gamma_rate  # within-school transmission, R0 about 15
+alpha      <- 0.05  # fraction of transmission coming from other schools
+times      <- seq(0, 200, by = 1)  # days to simulate
 
-N <- df$total_students
-R0_count <- round(N * df$vax_rate)
-I0_count <- c(1, rep(0, n_schools - 1))
-E0_count <- rep(0, n_schools)
-S0_count <- pmax(0, N - I0_count - E0_count - R0_count)
+N <- df$total_students  # students in each school
+R0_count <- round(N * df$vax_rate)  # students already immune
+I0_count <- c(1, rep(0, n_schools - 1))  # index cases at the start
+E0_count <- rep(0, n_schools)  # exposed at the start, usually none
+S0_count <- pmax(0, N - I0_count - E0_count - R0_count)  # students still susceptible
 
-initial_state <- c(S0_count, E0_count, I0_count, R0_count)
+initial_state <- c(S0_count, E0_count, I0_count, R0_count)  # starting S, E, I, and R
 names(initial_state) <- c(
   paste0("S_", 1:n_schools),
   paste0("E_", 1:n_schools),
@@ -80,7 +80,7 @@ names(initial_state) <- c(
   paste0("R_", 1:n_schools)
 )
 
-params <- list(
+params <- list(  # parameters passed into the solver
   beta  = beta_rate,
   sigma = sigma_rate,
   gamma = gamma_rate,
@@ -90,43 +90,43 @@ params <- list(
   n     = n_schools
 )
 
-seir_model <- function(time, state, parameters) {
+seir_model <- function(time, state, parameters) {  # SEIR equations for one time step
   with(as.list(parameters), {
     S <- state[1:n]
     E <- state[(n + 1):(2 * n)]
     I <- state[(2 * n + 1):(3 * n)]
     R <- state[(3 * n + 1):(4 * n)]
 
-    I_prop <- I / N
-    lambda <- (beta * I_prop) + (alpha * beta * as.vector(A %*% I_prop))
+    I_prop <- I / N  # infectious fraction in each school
+    lambda <- (beta * I_prop) + (alpha * beta * as.vector(A %*% I_prop))  # force of infection from this school and its neighbours
 
-    dS <- - lambda * S
-    dE <-   lambda * S - (sigma * E)
-    dI <-  (sigma * E) - (gamma * I)
-    dR <-  (gamma * I)
+    dS <- - lambda * S  # infections leave the susceptible class
+    dE <-   lambda * S - (sigma * E)  # new exposures minus those becoming infectious
+    dI <-  (sigma * E) - (gamma * I)  # new infectious students minus recoveries
+    dR <-  (gamma * I)  # students leaving the infectious class
 
-    return(list(c(dS, dE, dI, dR)))
+    return(list(c(dS, dE, dI, dR)))  # hand the derivatives to the solver
   })
 }
 
-output <- ode(y = initial_state, times = times, func = seir_model, parms = params)
-results_long <- as.data.frame(output) %>%
-  pivot_longer(cols = -time, names_to = "var", values_to = "Count") %>%
+output <- ode(y = initial_state, times = times, func = seir_model, parms = params)  # solve the SEIR equations
+results_long <- as.data.frame(output) %>%  # one row per compartment and day
+  pivot_longer(cols = -time, names_to = "var", values_to = "Count") %>%  # one row per compartment
   mutate(
     Compartment = str_extract(var, "^[SEIR]"),
     school_id   = as.numeric(str_extract(var, "\\d+"))
   ) %>%
-  left_join(df, by = "school_id") %>%
+  left_join(df, by = "school_id") %>%  # join the tables
   mutate(school_label = paste0(school_name, "\n(Vax: ", round(vax_rate * 100, 1), "%, Pop: ", total_students, ")"))
 
-total_pages <- max(df$page)
+total_pages <- max(df$page)  # number of figure pages
 
-for (p in 1:total_pages) {
-  page_data <- results_long %>% filter(page == p)
+for (p in 1:total_pages) {  # one figure page at a time
+  page_data <- results_long %>% filter(page == p)  # schools drawn on this page
 
-  p_plot <- ggplot(page_data, aes(x = time, y = Count, color = Compartment)) +
-    geom_line(linewidth = 1) +
-    scale_color_manual(
+  p_plot <- ggplot(page_data, aes(x = time, y = Count, color = Compartment)) +  # start the plot
+    geom_line(linewidth = 1) +  # draw the time series
+    scale_color_manual(  # set the legend colours or line types
       values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green"),
       labels = c(
         "S" = "Susceptible (S)",
@@ -135,18 +135,18 @@ for (p in 1:total_pages) {
         "R" = "Recovered/Vaccinated (R)"
       )
     ) +
-    facet_wrap(~school_label, ncol = 3, scales = "free_y") +
-    labs(
+    facet_wrap(~school_label, ncol = 3, scales = "free_y") +  # one panel per group
+    labs(  # titles and axis labels
       title = paste0("SEIR Measles Simulations (Page ", p, " of ", total_pages, ")"),
       x = "Days",
       y = "Number of Students",
       color = "Compartment"
     ) +
-    theme_minimal() +
+    theme_minimal() +  # plain plot theme
     theme(
       strip.text = element_text(size = 8, face = "bold"),
       legend.position = "bottom"
     )
 
-  print(p_plot)
+  print(p_plot)  # show the result
 }
