@@ -1,41 +1,3 @@
-
-# ==============================================================================
-# SENSITIVITY ANALYSIS: VACCINE ALLOCATION BY SCHOOL SIZE THRESHOLD
-# CUTOFFS: 700, 1000, AND 1300 STUDENTS
-#
-# OBJECTIVE:
-# Compare vaccination allocation strategies while matching aggregate vaccination
-# coverage between the two allocation scenarios for each school-size cutoff.
-#
-# SCENARIOS:
-# 1. Uniform 70%
-# 2. Uniform 80%
-# 3. Large-school emphasis: small schools 75%, large schools 90%
-# 4. Small-school emphasis: large schools 75%, small-school coverage calculated
-#    to match the aggregate coverage of Scenario 3
-# 5. Uniform 90%
-#
-# MODEL:
-# Deterministic network-based SEIR model.
-#
-# TOTAL NEW CASES:
-# C(T) = sum_i [S_i(0) - S_i(T)]
-#
-# PLOT COLOURS:
-# Uniform 70%  = Blue
-# Uniform 80%  = Red
-# Large Emphasis = Green
-# Small Emphasis = Purple
-# Uniform 90%  = Brown
-#
-# All epidemic curves use solid lines.
-# ==============================================================================
-
-
-# ==============================================================================
-# 1. LOAD REQUIRED PACKAGES
-# ==============================================================================
-
 required_packages <- c(
   "deSolve",
   "dplyr",
@@ -58,11 +20,6 @@ library(tibble)
 library(tidyr)
 library(ggplot2)
 
-
-# ==============================================================================
-# 2. LOAD AND STANDARDIZE DATA
-# ==============================================================================
-
 school_file  <- "data/processed/school_data_joined.csv"
 network_file <- "data/processed/network_df.csv"
 
@@ -82,44 +39,38 @@ network_data <- read_csv(
   show_col_types = FALSE
 )
 
-
-# Standardize column names.
-
 standardize_names <- function(data) {
-  
+
   names(data) <- tolower(trimws(names(data)))
-  
+
   names(data) <- gsub(
     "[[:space:]-]+",
     "_",
     names(data)
   )
-  
+
   names(data) <- make.unique(
     names(data),
     sep = "_duplicate_"
   )
-  
+
   return(data)
 }
 
 school_data  <- standardize_names(school_data)
 network_data <- standardize_names(network_data)
 
-
-# Identify and standardize required columns.
-
 standardize_column <- function(data, target_name, possible_names) {
-  
+
   if (target_name %in% names(data)) {
     return(data)
   }
-  
+
   matches <- intersect(
     possible_names,
     names(data)
   )
-  
+
   if (length(matches) == 0) {
     stop(
       "Could not identify column: ",
@@ -128,17 +79,14 @@ standardize_column <- function(data, target_name, possible_names) {
       paste(names(data), collapse = ", ")
     )
   }
-  
+
   data <- dplyr::rename(
     data,
     !!target_name := all_of(matches[1])
   )
-  
+
   return(data)
 }
-
-
-# School data columns.
 
 school_data <- standardize_column(
   school_data,
@@ -164,9 +112,6 @@ school_data <- standardize_column(
   c("mmr_pr", "mmr_coverage", "vaccination_coverage")
 )
 
-
-# Network data columns.
-
 network_data <- standardize_column(
   network_data,
   "unit_id_a",
@@ -184,11 +129,6 @@ network_data <- standardize_column(
   "connect_risk",
   c("total_contacts", "weight", "risk")
 )
-
-
-# ==============================================================================
-# 3. CLEAN SCHOOL DATA
-# ==============================================================================
 
 school_data <- school_data %>%
   mutate(
@@ -213,7 +153,6 @@ school_data <- school_data %>%
     .keep_all = TRUE
   )
 
-
 if (nrow(school_data) < 2) {
   stop("Insufficient valid schools in the school dataset.")
 }
@@ -221,9 +160,6 @@ if (nrow(school_data) < 2) {
 if (anyDuplicated(school_data$unit_id)) {
   stop("Duplicate school IDs remain after cleaning.")
 }
-
-
-# Extract school populations and identifiers.
 
 N <- school_data$total_students
 
@@ -234,7 +170,6 @@ school_names <- school_data$school_name
 school_ids <- school_data$unit_id
 
 total_population <- sum(N)
-
 
 cat("\n============================================================\n")
 cat("SCHOOL DATA SUMMARY\n")
@@ -249,11 +184,6 @@ cat(
   sum(is.na(school_data$percent_immunized)),
   "\n"
 )
-
-
-# ==============================================================================
-# 4. CLEAN NETWORK DATA AND BUILD ADJACENCY MATRIX
-# ==============================================================================
 
 network_data <- network_data %>%
   mutate(
@@ -275,10 +205,6 @@ network_data <- network_data %>%
     index_b = match(unit_id_b, school_ids)
   )
 
-
-# Construct undirected school pairs.
-# Repeated observations for a school pair are averaged.
-
 network_edges <- network_data %>%
   mutate(
     node_1 = pmin(index_a, index_b),
@@ -294,16 +220,12 @@ network_edges <- network_data %>%
     weight > 0
   )
 
-
 if (nrow(network_edges) == 0) {
   stop(
     "No positive network edges remain after cleaning. ",
     "Check school IDs and connectivity weights."
   )
 }
-
-
-# Create a symmetric adjacency matrix.
 
 A_raw <- matrix(
   0,
@@ -312,20 +234,17 @@ A_raw <- matrix(
 )
 
 for (k in seq_len(nrow(network_edges))) {
-  
+
   i <- network_edges$node_1[k]
-  
+
   j <- network_edges$node_2[k]
-  
+
   w <- network_edges$weight[k]
-  
+
   A_raw[i, j] <- w
-  
+
   A_raw[j, i] <- w
 }
-
-
-# Normalize the adjacency matrix by its spectral radius.
 
 spectral_radius <- max(
   Mod(
@@ -344,7 +263,6 @@ if (!is.finite(spectral_radius) || spectral_radius <= 0) {
 
 A <- A_raw / spectral_radius
 
-
 cat("\n============================================================\n")
 cat("NETWORK SUMMARY\n")
 cat("============================================================\n")
@@ -361,22 +279,11 @@ cat(
   "\n"
 )
 
-
-# ==============================================================================
-# 5. MODEL PARAMETERS
-# ==============================================================================
-
-# Introduce infection into the first school in the dataset.
-# The seed location remains fixed across all scenarios.
-
 seed_school_index <- 1
 
 if (seed_school_index < 1 || seed_school_index > n_school) {
   stop("Invalid seed school index.")
 }
-
-
-# SEIR parameters.
 
 gamma_rate <- 1 / 7
 
@@ -386,72 +293,50 @@ beta_rate <- 15 * gamma_rate
 
 alpha <- 0.05
 
-
-# Simulate from day 0 to day 200.
-
 simulation_times <- seq(
   0,
   200,
   by = 1
 )
 
-
-# ==============================================================================
-# 6. DEFINE THE NETWORK-BASED SEIR MODEL
-# ==============================================================================
-
 network_seir <- function(t, state, parms) {
-  
+
   N <- parms$N
-  
+
   A <- parms$A
-  
+
   beta_rate <- parms$beta_rate
-  
+
   sigma_rate <- parms$sigma_rate
-  
+
   gamma_rate <- parms$gamma_rate
-  
+
   alpha <- parms$alpha
-  
+
   n <- length(N)
-  
-  
-  # Extract the compartments for all schools.
-  
+
   S <- state[seq_len(n)]
-  
+
   E <- state[n + seq_len(n)]
-  
+
   I <- state[2 * n + seq_len(n)]
-  
+
   R <- state[3 * n + seq_len(n)]
-  
-  
-  # Infectious fractions within schools.
-  
+
   infectious_fraction <- I / N
-  
-  
-  # Force of infection:
-  # Within-school transmission plus between-school transmission.
-  
+
   lambda <- beta_rate * infectious_fraction +
     alpha * beta_rate *
     as.vector(A %*% infectious_fraction)
-  
-  
-  # SEIR equations.
-  
+
   dS <- -lambda * S
-  
+
   dE <- lambda * S - sigma_rate * E
-  
+
   dI <- sigma_rate * E - gamma_rate * I
-  
+
   dR <- gamma_rate * I
-  
-  
+
   return(
     list(
       c(dS, dE, dI, dR)
@@ -459,88 +344,57 @@ network_seir <- function(t, state, parms) {
   )
 }
 
-
-# ==============================================================================
-# 7. DEFINE THE SIMULATION FUNCTION
-# ==============================================================================
-
 run_scenario <- function(
     scenario_name,
     vax_vector,
     cutoff_val,
     small_schools_vec
 ) {
-  
-  # --------------------------------------------------------------------------
-  # 7.1 Validate vaccination coverage
-  # --------------------------------------------------------------------------
-  
+
   if (length(vax_vector) != n_school) {
     stop(
       "Vaccination vector length does not match the number of schools."
     )
   }
-  
+
   if (any(!is.finite(vax_vector)) ||
       any(vax_vector < 0 | vax_vector > 1)) {
-    
+
     stop(
       "Invalid vaccination coverage in scenario: ",
       scenario_name
     )
   }
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.2 Set initial conditions
-  # --------------------------------------------------------------------------
-  
-  # Initially vaccinated students are placed in the recovered compartment.
-  
+
   R_init <- N * vax_vector
-  
+
   E_init <- rep(
     0,
     n_school
   )
-  
+
   I_init <- rep(
     0,
     n_school
   )
-  
-  
-  # Introduce one infectious student into the seed school.
-  
+
   I_init[seed_school_index] <- 1
-  
-  
-  # Calculate the initial susceptible population.
-  
+
   S_init <- N - R_init - E_init - I_init
-  
-  
-  # Reject scenarios with invalid initial conditions.
-  
+
   if (any(S_init < -1e-8)) {
-    
+
     stop(
       "Negative initial susceptible population in scenario: ",
       scenario_name,
       ". Check vaccination coverage and the seed school."
     )
   }
-  
-  
-  # Correct negligible floating-point errors.
-  
+
   S_init[abs(S_init) < 1e-10] <- 0
-  
-  
-  # Verify that the initial population is conserved.
-  
+
   initial_population_check <- S_init + E_init + I_init + R_init
-  
+
   if (!isTRUE(
     all.equal(
       as.numeric(initial_population_check),
@@ -548,37 +402,27 @@ run_scenario <- function(
       tolerance = 1e-8
     )
   )) {
-    
+
     stop(
       "Initial population conservation failed in scenario: ",
       scenario_name
     )
   }
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.3 Assemble initial state
-  # --------------------------------------------------------------------------
-  
+
   initial_state <- c(
     S_init,
     E_init,
     I_init,
     R_init
   )
-  
+
   names(initial_state) <- c(
     paste0("S", seq_len(n_school)),
     paste0("E", seq_len(n_school)),
     paste0("I", seq_len(n_school)),
     paste0("R", seq_len(n_school))
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.4 Run the SEIR simulation
-  # --------------------------------------------------------------------------
-  
+
   model_parameters <- list(
     N = N,
     A = A,
@@ -587,8 +431,7 @@ run_scenario <- function(
     gamma_rate = gamma_rate,
     alpha = alpha
   )
-  
-  
+
   simulation <- as.data.frame(
     ode(
       y = initial_state,
@@ -598,12 +441,7 @@ run_scenario <- function(
       method = "lsoda"
     )
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.5 Extract susceptible and infectious populations
-  # --------------------------------------------------------------------------
-  
+
   S_matrix <- as.matrix(
     simulation[
       ,
@@ -611,7 +449,7 @@ run_scenario <- function(
       drop = FALSE
     ]
   )
-  
+
   I_matrix <- as.matrix(
     simulation[
       ,
@@ -619,146 +457,105 @@ run_scenario <- function(
       drop = FALSE
     ]
   )
-  
-  
-  # Total infectious students across all schools at each time point.
-  
+
   total_I <- rowSums(I_matrix)
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.6 Calculate peak burden and peak day
-  # --------------------------------------------------------------------------
-  
+
   peak_row <- which.max(total_I)
-  
+
   peak_burden <- total_I[peak_row]
-  
+
   peak_day <- simulation$time[peak_row]
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.7 Calculate total new cases using susceptible depletion
-  # --------------------------------------------------------------------------
-  
+
   final_S <- S_matrix[nrow(S_matrix), ]
-  
-  # C(T) = sum_i [S_i(0) - S_i(T)]
-  
+
   cumulative_new_cases <- sum(
     S_init - final_S
   )
-  
-  
-  # County attack rate.
-  
+
   county_attack_rate <- (
     cumulative_new_cases / total_population
   ) * 100
-  
-  
-  # Population-weighted aggregate vaccination coverage.
-  
+
   aggregate_coverage <- (
     sum(N * vax_vector) / total_population
   ) * 100
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.8 Calculate vaccination coverage by school-size group
-  # --------------------------------------------------------------------------
-  
+
   small_population <- sum(
     N[small_schools_vec]
   )
-  
+
   large_population <- sum(
     N[!small_schools_vec]
   )
-  
-  
+
   small_cov <- (
     sum(
       N[small_schools_vec] *
         vax_vector[small_schools_vec]
     ) / small_population
   ) * 100
-  
-  
+
   large_cov <- (
     sum(
       N[!small_schools_vec] *
         vax_vector[!small_schools_vec]
     ) / large_population
   ) * 100
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.9 Create scenario summary
-  # --------------------------------------------------------------------------
-  
+
   summary_row <- tibble(
-    
+
     `Cutoff Threshold` = cutoff_val,
-    
+
     Scenario = scenario_name,
-    
+
     `Small School Vax (%)` = round(
       small_cov,
       2
     ),
-    
+
     `Large School Vax (%)` = round(
       large_cov,
       2
     ),
-    
+
     `Aggregate Vax (%)` = round(
       aggregate_coverage,
       2
     ),
-    
+
     `Total New Cases (C)` = round(
       cumulative_new_cases
     ),
-    
+
     `Peak Burden (Ipeak)` = round(
       peak_burden
     ),
-    
+
     `Peak Day` = round(
       peak_day
     ),
-    
+
     `Attack Rate (AR)` = paste0(
       round(county_attack_rate, 2),
       "%"
     )
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 7.10 Create epidemic time series
-  # --------------------------------------------------------------------------
-  
+
   time_series <- tibble(
-    
+
     time = simulation$time,
-    
+
     total_infectious = total_I,
-    
+
     Scenario = scenario_name,
-    
+
     Cutoff = paste0(
       "Cutoff: ",
       cutoff_val,
       " students"
     )
   )
-  
-  
-  # Return both outputs.
-  
+
   return(
     list(
       summary = summary_row,
@@ -766,11 +563,6 @@ run_scenario <- function(
     )
   )
 }
-
-
-# ==============================================================================
-# 8. RUN THE SENSITIVITY ANALYSIS
-# ==============================================================================
 
 cutoff_thresholds <- c(
   700,
@@ -782,147 +574,109 @@ summary_results <- list()
 
 time_series_data <- list()
 
-
 for (cutoff in cutoff_thresholds) {
-  
+
   cat("\n============================================================\n")
-  
+
   cat(
     "PROCESSING SCHOOL-SIZE CUTOFF:",
     cutoff,
     "STUDENTS\n"
   )
-  
+
   cat("============================================================\n")
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.1 Classify schools
-  # --------------------------------------------------------------------------
-  
+
   small_schools <- N <= cutoff
-  
+
   large_schools <- N > cutoff
-  
-  
-  # Skip cutoffs that do not produce both groups.
-  
+
   if (sum(small_schools) == 0 ||
       sum(large_schools) == 0) {
-    
+
     warning(
       "Skipping cutoff ",
       cutoff,
       " because one school-size group is empty."
     )
-    
+
     next
   }
-  
-  
-  # Calculate populations in each group.
-  
+
   pop_small <- sum(
     N[small_schools]
   )
-  
+
   pop_large <- sum(
     N[large_schools]
   )
-  
+
   pop_total <- sum(N)
-  
-  
+
   cat(
     "Number of small schools:",
     sum(small_schools),
     "\n"
   )
-  
+
   cat(
     "Number of large schools:",
     sum(large_schools),
     "\n"
   )
-  
+
   cat(
     "Small-school population:",
     pop_small,
     "\n"
   )
-  
+
   cat(
     "Large-school population:",
     pop_large,
     "\n"
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.2 Uniform vaccination scenarios
-  # --------------------------------------------------------------------------
-  
+
   vax_uniform_70 <- rep(
     0.70,
     n_school
   )
-  
+
   vax_uniform_80 <- rep(
     0.80,
     n_school
   )
-  
+
   vax_uniform_90 <- rep(
     0.90,
     n_school
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.3 Scenario A: Higher vaccination coverage in large schools
-  # --------------------------------------------------------------------------
-  
+
   small_cov_A <- 0.75
-  
+
   large_cov_A <- 0.90
-  
-  
+
   vax_size_A <- ifelse(
     small_schools,
     small_cov_A,
     large_cov_A
   )
-  
-  
-  # Calculate aggregate vaccination coverage for Scenario A.
-  
+
   anchor_aggregate <- (
     pop_small * small_cov_A +
       pop_large * large_cov_A
   ) / pop_total
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.4 Scenario B: Higher vaccination coverage in small schools
-  # --------------------------------------------------------------------------
-  
+
   large_cov_B <- 0.75
-  
-  
-  # Solve for small-school coverage that matches Scenario A.
-  
+
   small_cov_B <- (
     anchor_aggregate * pop_total -
       large_cov_B * pop_large
   ) / pop_small
-  
-  
-  # Verify that the calculated coverage is feasible.
-  
+
   if (!is.finite(small_cov_B) ||
       small_cov_B < 0 ||
       small_cov_B > 1) {
-    
+
     stop(
       "Infeasible allocation at cutoff ",
       cutoff,
@@ -931,28 +685,21 @@ for (cutoff in cutoff_thresholds) {
       "%. The allocation strategy must be revised."
     )
   }
-  
-  
+
   vax_size_B <- ifelse(
     small_schools,
     small_cov_B,
     large_cov_B
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.5 Verify matching aggregate coverage
-  # --------------------------------------------------------------------------
-  
+
   aggregate_A <- sum(
     N * vax_size_A
   ) / pop_total
-  
+
   aggregate_B <- sum(
     N * vax_size_B
   ) / pop_total
-  
-  
+
   if (!isTRUE(
     all.equal(
       aggregate_A,
@@ -960,17 +707,16 @@ for (cutoff in cutoff_thresholds) {
       tolerance = 1e-10
     )
   )) {
-    
+
     stop(
       "Aggregate vaccination coverage does not match at cutoff ",
       cutoff,
       "."
     )
   }
-  
-  
+
   cat("\nAllocation scenarios:\n")
-  
+
   cat(
     "Scenario A - Small schools:",
     round(small_cov_A * 100, 2),
@@ -978,7 +724,7 @@ for (cutoff in cutoff_thresholds) {
     round(large_cov_A * 100, 2),
     "%\n"
   )
-  
+
   cat(
     "Scenario B - Small schools:",
     round(small_cov_B * 100, 2),
@@ -986,42 +732,34 @@ for (cutoff in cutoff_thresholds) {
     round(large_cov_B * 100, 2),
     "%\n"
   )
-  
+
   cat(
     "Matched aggregate vaccination coverage:",
     round(aggregate_A * 100, 2),
     "%\n"
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.6 Run all five scenarios
-  # --------------------------------------------------------------------------
-  
+
   sc_70 <- run_scenario(
     scenario_name = "Uniform 70%",
     vax_vector = vax_uniform_70,
     cutoff_val = cutoff,
     small_schools_vec = small_schools
   )
-  
-  
+
   sc_80 <- run_scenario(
     scenario_name = "Uniform 80%",
     vax_vector = vax_uniform_80,
     cutoff_val = cutoff,
     small_schools_vec = small_schools
   )
-  
-  
+
   sc_size_A <- run_scenario(
     scenario_name = "Large Emphasis (Small 75%, Large 90%)",
     vax_vector = vax_size_A,
     cutoff_val = cutoff,
     small_schools_vec = small_schools
   )
-  
-  
+
   sc_size_B <- run_scenario(
     scenario_name = paste0(
       "Small Emphasis (Small ",
@@ -1032,63 +770,46 @@ for (cutoff in cutoff_thresholds) {
     cutoff_val = cutoff,
     small_schools_vec = small_schools
   )
-  
-  
+
   sc_90 <- run_scenario(
     scenario_name = "Uniform 90%",
     vax_vector = vax_uniform_90,
     cutoff_val = cutoff,
     small_schools_vec = small_schools
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.7 Store summary results
-  # --------------------------------------------------------------------------
-  
+
   summary_results[[as.character(cutoff)]] <- bind_rows(
-    
+
     sc_70$summary,
-    
+
     sc_80$summary,
-    
+
     sc_size_A$summary,
-    
+
     sc_size_B$summary,
-    
+
     sc_90$summary
   )
-  
-  
-  # --------------------------------------------------------------------------
-  # 8.8 Store epidemic time series
-  # --------------------------------------------------------------------------
-  
+
   time_series_data[[as.character(cutoff)]] <- bind_rows(
-    
+
     sc_70$time_series,
-    
+
     sc_80$time_series,
-    
+
     sc_size_A$time_series,
-    
+
     sc_size_B$time_series,
-    
+
     sc_90$time_series
   )
 }
-
-
-# ==============================================================================
-# 9. COMBINE RESULTS
-# ==============================================================================
 
 if (length(summary_results) == 0) {
   stop(
     "No simulations were completed. Check the school-size cutoffs and data."
   )
 }
-
 
 final_table <- bind_rows(
   summary_results
@@ -1097,9 +818,6 @@ final_table <- bind_rows(
 final_ts <- bind_rows(
   time_series_data
 )
-
-
-# Arrange scenarios in a consistent order.
 
 small_emphasis_names <- unique(
   final_table$Scenario[
@@ -1115,7 +833,6 @@ scenario_order <- c(
   "Uniform 90%"
 )
 
-
 final_table <- final_table %>%
   mutate(
     Scenario = factor(
@@ -1130,7 +847,6 @@ final_table <- final_table %>%
   mutate(
     Scenario = as.character(Scenario)
   )
-
 
 final_ts <- final_ts %>%
   mutate(
@@ -1148,11 +864,6 @@ final_ts <- final_ts %>%
     )
   )
 
-
-# ==============================================================================
-# 10. PRINT SUMMARY TABLE
-# ==============================================================================
-
 cat("\n\n")
 
 cat("======================================================================\n")
@@ -1163,27 +874,19 @@ cat("SCHOOL-SIZE CUTOFFS: 700, 1000, AND 1300 STUDENTS\n")
 
 cat("======================================================================\n\n")
 
-
 print(
   final_table,
   n = Inf,
   width = Inf
 )
 
-
-# ==============================================================================
-# 11. EXPORT SUMMARY TABLE
-# ==============================================================================
-
 summary_output <- "output/tables/vaccine_allocation_threshold_summary_table.csv"
-
 
 write.csv(
   final_table,
   summary_output,
   row.names = FALSE
 )
-
 
 cat("\nSummary table exported to:\n")
 
@@ -1195,12 +898,6 @@ cat(
   "\n"
 )
 
-
-# ==============================================================================
-# 12. GENERATE EPIDEMIC CURVES WITH CUSTOM COLORS, LINESTYLES, & RIGHT LEGEND
-# ==============================================================================
-
-# Map scenario names to simplified, clean categories for legend grouping
 final_ts <- final_ts %>%
   mutate(
     Strategy_Category = case_when(
@@ -1211,7 +908,7 @@ final_ts <- final_ts %>%
       grepl("^Uniform 90%", Scenario) ~ "Uniform 90%",
       TRUE ~ as.character(Scenario)
     ),
-    # Assign distinct line styles for Small Emphasis across the 3 cutoffs
+
     Line_Style = case_when(
       Strategy_Category == "Small Emphasis" & grepl("700", Cutoff)  ~ "dashed",
       Strategy_Category == "Small Emphasis" & grepl("1000", Cutoff) ~ "dotted",
@@ -1220,25 +917,22 @@ final_ts <- final_ts %>%
     )
   )
 
-# Define explicit strategy colors as requested
 strategy_colours <- c(
-  "Uniform 70%"    = "#B95F89",  # Blue
-  "Uniform 80%"    = "#E41A1C",  # Red
-  "Large Emphasis" = "#008000",  # Green
-  "Small Emphasis" = "#0000FF",  # Blue (Differentiated by line style)
-  "Uniform 90%"    = "#5C3317"   # Brown
+  "Uniform 70%"    = "#B95F89",
+  "Uniform 80%"    = "#E41A1C",
+  "Large Emphasis" = "#008000",
+  "Small Emphasis" = "#0000FF",
+  "Uniform 90%"    = "#5C3317"
 )
 
-# Define explicit line styles
 strategy_linetypes <- c(
   "Uniform 70%"    = "solid",
   "Uniform 80%"    = "solid",
   "Large Emphasis" = "solid",
-  "Small Emphasis" = "dashed", # Primary representation in legend
+  "Small Emphasis" = "dashed",
   "Uniform 90%"    = "solid"
 )
 
-# Generate the plot
 p_epidemic_curves <- ggplot(
   final_ts,
   aes(
@@ -1258,7 +952,7 @@ p_epidemic_curves <- ggplot(
     name = "Vaccination Strategy",
     values = strategy_colours
   ) +
-  scale_linetype_identity() + # Uses the line styles mapped directly in data
+  scale_linetype_identity() +
   labs(
     title = "Measles Epidemic Curves Across School-Size Cutoffs",
     subtitle = "Comparison of vaccination allocation strategies with matched aggregate coverage",
@@ -1270,17 +964,15 @@ p_epidemic_curves <- ggplot(
     plot.title = element_text(face = "bold", size = 13),
     plot.subtitle = element_text(size = 10),
     strip.text = element_text(face = "bold", size = 11),
-    
-    # Legend boxed and positioned on the right
+
     legend.position = "right",
     legend.title = element_text(face = "bold", size = 10),
     legend.text = element_text(size = 9),
     legend.background = element_rect(fill = "white", color = "black", linewidth = 0.5),
     legend.box.margin = margin(6, 6, 6, 6),
     legend.key.width = grid::unit(1.2, "cm"),
-    
+
     panel.grid.minor = element_blank()
   )
 
-# Display the plot
 print(p_epidemic_curves)

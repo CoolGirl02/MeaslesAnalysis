@@ -1,14 +1,8 @@
-# ============================================================
-# NETWORK SEIR MEASLES SIMULATION AND SENSITIVITY ANALYSIS
-# FRAMEWORK
-# ============================================================
-
 suppressPackageStartupMessages({
   library(tidyverse)
   library(deSolve)
   library(igraph)
 })
-
 
 theme_set(
   theme_minimal() +
@@ -17,16 +11,10 @@ theme_set(
     )
 )
 
-
-# ============================================================
-# 1. LOAD SCHOOL DATA
-# ============================================================
-
 df <- read.csv(
   "data/processed/school_data_joined.csv"
 ) %>%
   rename_with(tolower)
-
 
 if (!"unit_id" %in% names(df)) {
   df <- df %>%
@@ -36,7 +24,6 @@ if (!"unit_id" %in% names(df)) {
     mutate(unit_id = as.character(unit_id))
 }
 
-
 df <- df %>%
   mutate(
     vax_rate = if_else(
@@ -44,25 +31,18 @@ df <- df %>%
       percent_immunized / 100,
       percent_immunized
     ),
-    
+
     school_id = row_number(),
-    
+
     page = ceiling(school_id / 6)
   )
 
-
 n_schools <- nrow(df)
-
-
-# ============================================================
-# 2. BUILD NETWORK ADJACENCY MATRIX (A)
-# ============================================================
 
 net_df <- read.csv(
   "data/processed/network_df.csv"
 ) %>%
   rename_with(tolower)
-
 
 id_cols <- names(net_df)[
   grep(
@@ -71,21 +51,19 @@ id_cols <- names(net_df)[
   )
 ]
 
-
 if (length(id_cols) >= 2) {
-  
+
   net_df <- net_df %>%
     rename(
       unit_id_a = !!sym(id_cols[1]),
       unit_id_b = !!sym(id_cols[2])
     )
-  
+
 } else {
-  
+
   colnames(net_df)[1:2] <-
     c("unit_id_a", "unit_id_b")
 }
-
 
 net_df <- net_df %>%
   mutate(
@@ -93,12 +71,10 @@ net_df <- net_df %>%
     unit_id_b = as.character(unit_id_b)
   )
 
-
 id_map <- setNames(
   1:n_schools,
   df$unit_id
 )
-
 
 A <- matrix(
   0,
@@ -106,16 +82,14 @@ A <- matrix(
   ncol = n_schools
 )
 
-
 for (k in seq_len(nrow(net_df))) {
-  
+
   i <- id_map[net_df$unit_id_a[k]]
-  
+
   j <- id_map[net_df$unit_id_b[k]]
-  
+
   if (!is.na(i) && !is.na(j)) {
-    
-    # USE TOTAL CONTACTS AS THE NETWORK WEIGHT
+
     w <- if (
       "total_contacts" %in% names(net_df)
     ) {
@@ -123,19 +97,13 @@ for (k in seq_len(nrow(net_df))) {
     } else {
       1
     }
-    
+
     A[i, j] <- w
     A[j, i] <- w
   }
 }
 
-
-# ============================================================
-# 3. GLOBAL NETWORK SCALING
-# ============================================================
-
 A_raw <- A
-
 
 spectral_radius <-
   max(
@@ -144,13 +112,7 @@ spectral_radius <-
     )
   )
 
-
 A <- A_raw / spectral_radius
-
-
-# ============================================================
-# 4. MODEL PARAMETERS
-# ============================================================
 
 gamma_rate <- 1 / 7
 
@@ -166,39 +128,26 @@ times <- seq(
   by = 1
 )
 
-
-# ============================================================
-# 5. POPULATION AND BASELINE INITIAL CONDITIONS
-# ============================================================
-
 N <- df$total_students
 
-
-# IMPORTANT:
-# Vaccinated population is rounded
 R0 <- round(
   N * df$vax_rate
 )
 
-
-# Baseline seed in School 1
 I0 <- c(
   1,
   rep(0, n_schools - 1)
 )
-
 
 E0 <- rep(
   0,
   n_schools
 )
 
-
 S0 <- pmax(
   0,
   N - I0 - E0 - R0
 )
-
 
 initial_state <- c(
   S0,
@@ -207,18 +156,12 @@ initial_state <- c(
   R0
 )
 
-
 names(initial_state) <- c(
   paste0("S_", 1:n_schools),
   paste0("E_", 1:n_schools),
   paste0("I_", 1:n_schools),
   paste0("R_", 1:n_schools)
 )
-
-
-# ============================================================
-# 6. MODEL PARAMETERS LIST
-# ============================================================
 
 params <- list(
   beta = beta_rate,
@@ -230,41 +173,34 @@ params <- list(
   n = n_schools
 )
 
-
-# ============================================================
-# 7. SEIR MODEL
-# ============================================================
-
 seir_model <- function(
     time,
     state,
     parameters
 ) {
-  
+
   with(
     as.list(parameters),
     {
-      
+
       S <- state[
         1:n
       ]
-      
+
       E <- state[
         (n + 1):(2 * n)
       ]
-      
+
       I <- state[
         (2 * n + 1):(3 * n)
       ]
-      
+
       R <- state[
         (3 * n + 1):(4 * n)
       ]
-      
-      
+
       I_prop <- I / N
-      
-      
+
       lambda <-
         (beta * I_prop) +
         (
@@ -274,22 +210,20 @@ seir_model <- function(
               A %*% I_prop
             )
         )
-      
-      
+
       dS <- -lambda * S
-      
+
       dE <-
         lambda * S -
         (sigma * E)
-      
+
       dI <-
         (sigma * E) -
         (gamma * I)
-      
+
       dR <-
         gamma * I
-      
-      
+
       list(
         c(
           dS,
@@ -302,34 +236,29 @@ seir_model <- function(
   )
 }
 
-
-# ============================================================
-# 8. FUNCTION TO CALCULATE TOTAL INFECTIOUS CASES
-# ============================================================
-
 get_total_I <- function(
     out_df,
     scenario_label,
     seed_type
 ) {
-  
+
   out_df %>%
-    
+
     pivot_longer(
       cols = -time,
       names_to = "var",
       values_to = "Count"
     ) %>%
-    
+
     filter(
       str_detect(
         var,
         "^I_"
       )
     ) %>%
-    
+
     group_by(time) %>%
-    
+
     summarise(
       total_infectious =
         sum(
@@ -338,46 +267,34 @@ get_total_I <- function(
         ),
       .groups = "drop"
     ) %>%
-    
+
     mutate(
       Scenario = scenario_label,
       `Seed Type` = seed_type
     )
 }
 
-
-# ============================================================
-# 9. FUNCTION TO RUN VACCINATION SCENARIO
-# ============================================================
-
 run_vax_scenario <- function(
     vax_vector,
     seed_id
 ) {
-  
-  # Rounded vaccinated population
+
   R0_vec <- round(
     N * vax_vector
   )
-  
-  
-  # Initial infected
+
   I0_vec <- rep(
     0,
     n_schools
   )
-  
+
   I0_vec[seed_id] <- 1
-  
-  
-  # Initial exposed
+
   E0_vec <- rep(
     0,
     n_schools
   )
-  
-  
-  # Initial susceptible
+
   S0_vec <- pmax(
     0,
     N -
@@ -385,22 +302,17 @@ run_vax_scenario <- function(
       E0_vec -
       R0_vec
   )
-  
-  
-  # Initial state
+
   state_vec <- c(
     S0_vec,
     E0_vec,
     I0_vec,
     R0_vec
   )
-  
-  
+
   names(state_vec) <-
     names(initial_state)
-  
-  
-  # Run model
+
   out_df <- as.data.frame(
     ode(
       y = state_vec,
@@ -409,15 +321,9 @@ run_vax_scenario <- function(
       parms = params
     )
   )
-  
-  
+
   return(out_df)
 }
-
-
-# ============================================================
-# 10. BASELINE SEIR SIMULATION
-# ============================================================
 
 output <- ode(
   y = initial_state,
@@ -426,26 +332,21 @@ output <- ode(
   parms = params
 )
 
-
-# ============================================================
-# 11. BASELINE RESULTS BY SCHOOL
-# ============================================================
-
 results_long <- as.data.frame(output) %>%
-  
+
   pivot_longer(
     cols = -time,
     names_to = "var",
     values_to = "Count"
   ) %>%
-  
+
   mutate(
     Compartment =
       str_extract(
         var,
         "^[SEIR]"
       ),
-    
+
     school_id =
       as.numeric(
         str_extract(
@@ -454,12 +355,12 @@ results_long <- as.data.frame(output) %>%
         )
       )
   ) %>%
-  
+
   left_join(
     df,
     by = "school_id"
   ) %>%
-  
+
   mutate(
     school_label =
       paste0(
@@ -472,23 +373,16 @@ results_long <- as.data.frame(output) %>%
       )
   )
 
-
-# ============================================================
-# 12. BASELINE SCHOOL PLOTS
-# ============================================================
-
 total_pages <- max(
   df$page
 )
 
-
 for (p in 1:total_pages) {
-  
+
   page_data <-
     results_long %>%
     filter(page == p)
-  
-  
+
   p_plot <- ggplot(
     page_data,
     aes(
@@ -497,11 +391,11 @@ for (p in 1:total_pages) {
       color = Compartment
     )
   ) +
-    
+
     geom_line(
       linewidth = 1
     ) +
-    
+
     scale_color_manual(
       values = c(
         "S" = "blue",
@@ -509,7 +403,7 @@ for (p in 1:total_pages) {
         "I" = "red",
         "R" = "green"
       ),
-      
+
       labels = c(
         "S" = "Susceptible",
         "E" = "Exposed",
@@ -517,13 +411,13 @@ for (p in 1:total_pages) {
         "R" = "Recovered/Vaccinated"
       )
     ) +
-    
+
     facet_wrap(
       ~school_label,
       ncol = 3,
       scales = "free_y"
     ) +
-    
+
     labs(
       title =
         paste0(
@@ -533,32 +427,26 @@ for (p in 1:total_pages) {
           total_pages,
           ")"
         ),
-      
+
       x = "Days",
-      
+
       y = "Number of Students",
-      
+
       color = "Compartment"
     ) +
-    
+
     theme(
       strip.text =
         element_text(
           size = 8,
           face = "bold"
         ),
-      
+
       legend.position = "bottom"
     )
-  
-  
+
   print(p_plot)
 }
-
-
-# ============================================================
-# 13. NETWORK CENTRALITY
-# ============================================================
 
 net_graph <-
   graph_from_adjacency_matrix(
@@ -567,12 +455,10 @@ net_graph <-
     weighted = TRUE
   )
 
-
 df$node_strength <-
   strength(
     net_graph
   )
-
 
 df$betweenness <-
   betweenness(
@@ -580,8 +466,6 @@ df$betweenness <-
     weights = NA
   )
 
-
-# Hub = highest node strength
 top_hub_id <-
   df$school_id[
     which.max(
@@ -589,8 +473,6 @@ top_hub_id <-
     )
   ]
 
-
-# Peripheral = lowest node strength
 low_hub_id <-
   df$school_id[
     which.min(
@@ -598,18 +480,15 @@ low_hub_id <-
     )
   ]
 
-
 top_hub_name <-
   df$school_name[
     df$school_id == top_hub_id
   ]
 
-
 low_hub_name <-
   df$school_name[
     df$school_id == low_hub_id
   ]
-
 
 cat("\n========================================\n")
 cat("NETWORK HUB AND PERIPHERAL SCHOOL\n")
@@ -627,14 +506,8 @@ cat(
   "\n"
 )
 
-
-# ============================================================
-# 14. SCENARIO 1: EMPIRICAL VACCINATION COVERAGE
-# ============================================================
-
 vax_empirical <-
   df$vax_rate
-
 
 out_hub_baseline <-
   run_vax_scenario(
@@ -642,29 +515,20 @@ out_hub_baseline <-
     top_hub_id
   )
 
-
 out_peri_baseline <-
   run_vax_scenario(
     vax_empirical,
     low_hub_id
   )
 
-
-# ============================================================
-# 15. SCENARIO 2: BOTH SEED SCHOOLS AT 74%
-# ============================================================
-
 vax_74 <-
   df$vax_rate
-
 
 vax_74[top_hub_id] <-
   0.74
 
-
 vax_74[low_hub_id] <-
   0.74
-
 
 out_hub_74 <-
   run_vax_scenario(
@@ -672,29 +536,20 @@ out_hub_74 <-
     top_hub_id
   )
 
-
 out_peri_74 <-
   run_vax_scenario(
     vax_74,
     low_hub_id
   )
 
-
-# ============================================================
-# 16. SCENARIO 3: BOTH SEED SCHOOLS AT 91.6%
-# ============================================================
-
 vax_916 <-
   df$vax_rate
-
 
 vax_916[top_hub_id] <-
   0.916
 
-
 vax_916[low_hub_id] <-
   0.916
-
 
 out_hub_916 <-
   run_vax_scenario(
@@ -702,76 +557,50 @@ out_hub_916 <-
     top_hub_id
   )
 
-
 out_peri_916 <-
   run_vax_scenario(
     vax_916,
     low_hub_id
   )
 
-
-# ============================================================
-# 17. PLOT ALL THREE SCENARIOS IN THE SAME FIGURE
-# ============================================================
-
 comparison_all <- bind_rows(
-  
-  
-  # ----------------------------------------------------------
-  # Scenario 1
-  # ----------------------------------------------------------
-  
+
   get_total_I(
     out_hub_baseline,
     "Scenario 1: Empirical Coverage",
     "Network Hub"
   ),
-  
+
   get_total_I(
     out_peri_baseline,
     "Scenario 1: Empirical Coverage",
     "Peripheral"
   ),
-  
-  
-  # ----------------------------------------------------------
-  # Scenario 2
-  # ----------------------------------------------------------
-  
+
   get_total_I(
     out_hub_74,
     "Scenario 2: Both Seed Schools at 74%",
     "Network Hub"
   ),
-  
+
   get_total_I(
     out_peri_74,
     "Scenario 2: Both Seed Schools at 74%",
     "Peripheral"
   ),
-  
-  
-  # ----------------------------------------------------------
-  # Scenario 3
-  # ----------------------------------------------------------
-  
+
   get_total_I(
     out_hub_916,
     "Scenario 3: Both Seed Schools at 91.6%",
     "Network Hub"
   ),
-  
+
   get_total_I(
     out_peri_916,
     "Scenario 3: Both Seed Schools at 91.6%",
     "Peripheral"
   )
 )
-
-
-# ============================================================
-# 18. SAME FIGURE: THREE PANELS
-# ============================================================
 
 ggplot(
   comparison_all,
@@ -781,44 +610,44 @@ ggplot(
     color = `Seed Type`
   )
 ) +
-  
+
   geom_line(
     linewidth = 1.2
   ) +
-  
+
   facet_wrap(
     ~Scenario,
     ncol = 3,
     scales = "free_y"
   ) +
-  
+
   scale_color_manual(
     values = c(
       "Network Hub" = "firebrick",
       "Peripheral" = "darkblue"
     )
   ) +
-  
+
   labs(
     title =
       "Sensitivity Analysis: Hub vs Peripheral Seeding",
-    
+
     subtitle =
       "Comparison across three vaccination coverage scenarios",
-    
+
     x =
       "Days Since Outbreak Introduction",
-    
+
     y =
       "Total Active Infectious Cases",
-    
+
     color =
       "Seed Location"
   ) +
-  
+
   theme(
     legend.position = "bottom",
-    
+
     strip.text =
       element_text(
         face = "bold",
@@ -826,35 +655,25 @@ ggplot(
       )
   )
 
-
-# ============================================================
-# 19. FUNCTION TO CALCULATE OUTBREAK MEASURES
-# ============================================================
-
 calculate_outbreak_measures <- function(
     out_df,
     seed_id
 ) {
-  
-  
-  # Identify R and I columns
+
   R_columns <-
     grep(
       "^R_",
       names(out_df),
       value = TRUE
     )
-  
-  
+
   I_columns <-
     grep(
       "^I_",
       names(out_df),
       value = TRUE
     )
-  
-  
-  # Final recovered population
+
   R_final <-
     sapply(
       R_columns,
@@ -864,13 +683,7 @@ calculate_outbreak_measures <- function(
         ]
       }
     )
-  
-  
-  # ----------------------------------------------------------
-  # IMPORTANT:
-  # Initial vaccinated population is rounded
-  # ----------------------------------------------------------
-  
+
   R_initial <-
     round(
       sapply(
@@ -880,25 +693,19 @@ calculate_outbreak_measures <- function(
         }
       )
     )
-  
-  
-  # New cases
+
   new_cases_each_school <-
     pmax(
       0,
       R_final - R_initial
     )
-  
-  
-  # Total new cases
+
   total_cases <-
     sum(
       new_cases_each_school,
       na.rm = TRUE
     )
-  
-  
-  # Total infectious population
+
   total_I <-
     rowSums(
       out_df[
@@ -908,39 +715,30 @@ calculate_outbreak_measures <- function(
       ],
       na.rm = TRUE
     )
-  
-  
-  # Peak burden
+
   peak_burden <-
     max(
       total_I,
       na.rm = TRUE
     )
-  
-  
-  # Peak day
+
   peak_day <-
     out_df$time[
       which.max(total_I)
     ]
-  
-  
-  # Total school population
+
   county_population <-
     sum(
       N,
       na.rm = TRUE
     )
-  
-  
-  # Attack rate
+
   attack_rate <-
     (
       total_cases /
         county_population
     ) * 100
-  
-  
+
   return(
     c(
       Total_Cases = total_cases,
@@ -951,17 +749,11 @@ calculate_outbreak_measures <- function(
   )
 }
 
-
-# ============================================================
-# 20. CALCULATE SCENARIO 1 RESULTS
-# ============================================================
-
 baseline_hub <-
   calculate_outbreak_measures(
     out_hub_baseline,
     top_hub_id
   )
-
 
 baseline_peri <-
   calculate_outbreak_measures(
@@ -969,17 +761,11 @@ baseline_peri <-
     low_hub_id
   )
 
-
-# ============================================================
-# 21. CALCULATE SCENARIO 2 RESULTS
-# ============================================================
-
 control_74_hub <-
   calculate_outbreak_measures(
     out_hub_74,
     top_hub_id
   )
-
 
 control_74_peri <-
   calculate_outbreak_measures(
@@ -987,17 +773,11 @@ control_74_peri <-
     low_hub_id
   )
 
-
-# ============================================================
-# 22. CALCULATE SCENARIO 3 RESULTS
-# ============================================================
-
 control_916_hub <-
   calculate_outbreak_measures(
     out_hub_916,
     top_hub_id
   )
-
 
 control_916_peri <-
   calculate_outbreak_measures(
@@ -1005,55 +785,46 @@ control_916_peri <-
     low_hub_id
   )
 
-
-# ============================================================
-# 23. CREATE TABLE 4.3
-# ============================================================
-
 results_4_3 <- tibble(
-  
-  
+
   Scenario = c(
-    
+
     "Scenario 1: Empirical Coverage",
     "Scenario 1: Empirical Coverage",
-    
+
     "Scenario 2: Both Seed Schools at 74%",
     "Scenario 2: Both Seed Schools at 74%",
-    
+
     "Scenario 3: Both Seed Schools at 91.6%",
     "Scenario 3: Both Seed Schools at 91.6%"
   ),
-  
-  
+
   `Seed Location` = c(
-    
+
     top_hub_name,
     low_hub_name,
-    
+
     top_hub_name,
     low_hub_name,
-    
+
     top_hub_name,
     low_hub_name
   ),
-  
-  
+
   `Seed Type` = c(
-    
+
     "Network Hub",
     "Peripheral",
-    
+
     "Network Hub",
     "Peripheral",
-    
+
     "Network Hub",
     "Peripheral"
   ),
-  
-  
+
   `Vaccination Coverage` = c(
-    
+
     paste0(
       round(
         vax_empirical[top_hub_id] * 100,
@@ -1061,7 +832,7 @@ results_4_3 <- tibble(
       ),
       "%"
     ),
-    
+
     paste0(
       round(
         vax_empirical[low_hub_id] * 100,
@@ -1069,91 +840,82 @@ results_4_3 <- tibble(
       ),
       "%"
     ),
-    
+
     "74.0%",
     "74.0%",
-    
+
     "91.6%",
     "91.6%"
   ),
-  
-  
+
   `Total New Cases (C)` = c(
-    
+
     baseline_hub["Total_Cases"],
     baseline_peri["Total_Cases"],
-    
+
     control_74_hub["Total_Cases"],
     control_74_peri["Total_Cases"],
-    
+
     control_916_hub["Total_Cases"],
     control_916_peri["Total_Cases"]
   ),
-  
-  
+
   `Peak Burden (Ipeak)` = c(
-    
+
     baseline_hub["Peak_Burden"],
     baseline_peri["Peak_Burden"],
-    
+
     control_74_hub["Peak_Burden"],
     control_74_peri["Peak_Burden"],
-    
+
     control_916_hub["Peak_Burden"],
     control_916_peri["Peak_Burden"]
   ),
-  
-  
+
   `Peak Day` = c(
-    
+
     baseline_hub["Peak_Day"],
     baseline_peri["Peak_Day"],
-    
+
     control_74_hub["Peak_Day"],
     control_74_peri["Peak_Day"],
-    
+
     control_916_hub["Peak_Day"],
     control_916_peri["Peak_Day"]
   ),
-  
-  
+
   `Attack Rate (AR)` = c(
-    
+
     baseline_hub["Attack_Rate"],
     baseline_peri["Attack_Rate"],
-    
+
     control_74_hub["Attack_Rate"],
     control_74_peri["Attack_Rate"],
-    
+
     control_916_hub["Attack_Rate"],
     control_916_peri["Attack_Rate"]
   )
 )
 
-
-# ============================================================
-# 24. ROUND TABLE VALUES
-# ============================================================
-
 table_4_3 <- results_4_3 %>%
-  
+
   mutate(
-    
+
     `Total New Cases (C)` =
       round(
         `Total New Cases (C)`
       ),
-    
+
     `Peak Burden (Ipeak)` =
       round(
         `Peak Burden (Ipeak)`
       ),
-    
+
     `Peak Day` =
       round(
         `Peak Day`
       ),
-    
+
     `Attack Rate (AR)` =
       paste0(
         round(
@@ -1164,27 +926,16 @@ table_4_3 <- results_4_3 %>%
       )
   )
 
-
-# ============================================================
-# 25. PRINT TABLE 4.3
-# ============================================================
-
 cat("\n\n")
 cat("============================================================\n")
 cat("TABLE 4.3: COMPARATIVE ANALYSIS OF HUB VS PERIPHERAL\n")
 cat("SEEDING SCENARIOS\n")
 cat("============================================================\n\n")
 
-
 print(
   table_4_3,
   n = Inf
 )
-
-
-# ============================================================
-# 26. OPTIONAL: KABLE TABLE
-# ============================================================
 
 if (
   requireNamespace(
@@ -1192,7 +943,7 @@ if (
     quietly = TRUE
   )
 ) {
-  
+
   print(
     knitr::kable(
       table_4_3,
@@ -1212,18 +963,8 @@ if (
   )
 }
 
-
-# ============================================================
-# 27. SAVE TABLE
-# ============================================================
-
 write.csv(
   table_4_3,
   "output/tables/table_4_3_hub_vs_peripheral.csv",
   row.names = FALSE
 )
-
-
-# ============================================================
-# END
-# ============================================================

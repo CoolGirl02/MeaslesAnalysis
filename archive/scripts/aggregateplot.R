@@ -1,14 +1,8 @@
-# ============================================================
-# 19. POPULATION-WIDE AGGREGATION & PLOTTING (EXCLUDING R)
-# ============================================================
-
-# Aggregate counts across all schools for each time point and compartment (excluding R)
 pop_summary <- results_long %>%
   filter(Compartment != "R") %>%
   group_by(time, Compartment) %>%
   summarise(Total_Count = sum(Count), .groups = "drop")
 
-# Plot total population dynamics for S, E, and I only
 p_pop <- ggplot(
   pop_summary,
   aes(
@@ -67,20 +61,12 @@ p_pop <- ggplot(
 
 print(p_pop)
 
-# ============================================================
-# COUNTY & OVERALL POPULATION VACCINATION SUMMARY
-# ============================================================
-
-# 1. Total student population across all schools
 total_county_students <- sum(df$total_students, na.rm = TRUE)
 
-# 2. Total vaccinated students (handling raw rates or percentages)
 total_vaccinated_students <- sum(df$total_students * df$vax_rate, na.rm = TRUE)
 
-# 3. Overall county vaccination coverage rate
 county_vax_coverage <- total_vaccinated_students / total_county_students
 
-# Print overall summary metrics
 cat("\n=== COUNTY-WIDE SUMMARY METRICS ===\n")
 cat("Total Number of Schools:      ", nrow(df), "\n")
 cat("Total Student Population:      ", format(total_county_students, big.mark = ","), "\n")

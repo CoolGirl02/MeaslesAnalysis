@@ -1,12 +1,8 @@
-
-# Network SEIR Measles Simulation and Sensitivity Analysis Framework
-
 suppressPackageStartupMessages({
   library(tidyverse)
   library(deSolve)
   library(igraph)
 })
-
 
 theme_set(theme_minimal() + theme(plot.title = element_text(face = "bold", size = 12)))
 
@@ -27,9 +23,6 @@ df <- df %>%
   )
 
 n_schools <- nrow(df)
-
-
-# BUILD NETWORK ADJACENCY MATRIX (A)
 
 net_df <- read.csv("data/processed/network_df.csv") %>%
   rename_with(tolower)
@@ -61,24 +54,22 @@ for (k in seq_len(nrow(net_df))) {
     A[j, i] <- w
   }
 }
-# 1. Keep raw matrix built from mobility connectivity risk
-A_raw <- A  
 
-# 2. Find the master scale factor (spectral radius / largest eigenvalue)
+A_raw <- A
+
 spectral_radius <- max(Re(eigen(A_raw)$values))
 
-# 3. Scale the ENTIRE network globally by this single number
 A <- A_raw / spectral_radius
 
-gamma_rate <- 1 / 7         # Infectious period (~7 days)
-sigma_rate <- 1 / 10        # Incubation period (~10 days)
-beta_rate  <- 15 * gamma_rate # Intra-school transmission (R0 = 15)
-alpha      <- 0.05          # Inter-school coupling coefficient (5%)
+gamma_rate <- 1 / 7
+sigma_rate <- 1 / 10
+beta_rate  <- 15 * gamma_rate
+alpha      <- 0.05
 times      <- seq(0, 200, by = 1)
 
 N  <- df$total_students
 R0 <- round(N * df$vax_rate)
-I0 <- c(1, rep(0, n_schools - 1)) # Seed index case in School 1
+I0 <- c(1, rep(0, n_schools - 1))
 E0 <- rep(0, n_schools)
 S0 <- pmax(0, N - I0 - E0 - R0)
 
@@ -106,19 +97,18 @@ seir_model <- function(time, state, parameters) {
     E <- state[(n + 1):(2 * n)]
     I <- state[(2 * n + 1):(3 * n)]
     R <- state[(3 * n + 1):(4 * n)]
-    
+
     I_prop <- I / N
     lambda <- (beta * I_prop) + (alpha * beta * as.vector(A %*% I_prop))
-    
+
     dS <- -lambda * S
     dE <-  lambda * S - (sigma * E)
     dI <- (sigma * E) - (gamma * I)
     dR <- (gamma * I)
-    
+
     list(c(dS, dE, dI, dR))
   })
 }
-
 
 get_total_I <- function(out_df, scenario_label) {
   out_df %>%
@@ -134,14 +124,13 @@ run_vax_scenario <- function(vax_vector, label, seed_id = 1) {
   I0_vec <- rep(0, n_schools)
   I0_vec[seed_id] <- 1
   S0_vec <- pmax(0, N - I0_vec - R0_vec)
-  
+
   state_vec <- c(S0_vec, rep(0, n_schools), I0_vec, R0_vec)
   names(state_vec) <- names(initial_state)
-  
+
   out_df <- as.data.frame(ode(y = state_vec, times = times, func = seir_model, parms = params))
   get_total_I(out_df, label)
 }
-
 
 output <- ode(y = initial_state, times = times, func = seir_model, parms = params)
 
@@ -158,7 +147,7 @@ total_pages <- max(df$page)
 
 for (p in 1:total_pages) {
   page_data <- results_long %>% filter(page == p)
-  
+
   p_plot <- ggplot(page_data, aes(x = time, y = Count, color = Compartment)) +
     geom_line(linewidth = 1) +
     scale_color_manual(
@@ -171,12 +160,9 @@ for (p in 1:total_pages) {
       x = "Days", y = "Number of Students", color = "Compartment"
     ) +
     theme(strip.text = element_text(size = 8, face = "bold"), legend.position = "bottom")
-  
+
   print(p_plot)
 }
-
-
-#  SENSITIVITY ANALYSIS 1: VACCINATION COVERAGE VS. SCHOOL SIZE
 
 df_sens <- df %>%
   mutate(
@@ -195,12 +181,12 @@ for (v_cov in vax_scenarios) {
   I0_sens <- c(1, rep(0, n_schools - 1))
   E0_sens <- rep(0, n_schools)
   S0_sens <- pmax(0, N - I0_sens - E0_sens - R0_sens)
-  
+
   state_sens <- c(S0_sens, E0_sens, I0_sens, R0_sens)
   names(state_sens) <- names(initial_state)
-  
+
   out_sens <- ode(y = state_sens, times = times, func = seir_model, parms = params)
-  
+
   res_sens <- as.data.frame(out_sens) %>%
     pivot_longer(cols = -time, names_to = "var", values_to = "Count") %>%
     mutate(
@@ -215,7 +201,7 @@ for (v_cov in vax_scenarios) {
       attack_rate  = (pmax(0, total_cases) / total_students) * 100,
       scenario_vax = paste0(v_cov * 100, "%")
     )
-  
+
   sens_results <- bind_rows(sens_results, res_sens)
 }
 
@@ -232,18 +218,15 @@ ggplot(sens_summary, aes(x = vax_num, y = avg_attack_rate, color = school_size_c
   geom_line(linewidth = 1.2) +
   geom_point(size = 3) +
   geom_vline(xintercept = 95, linetype = "dashed", color = "red") +
-  annotate("text", x = 95.5, y = max(sens_summary$avg_attack_rate) * 0.9, 
+  annotate("text", x = 95.5, y = max(sens_summary$avg_attack_rate) * 0.9,
            label = "95% Herd Immunity Target", color = "red", angle = 90) +
   labs(
     title    = "Sensitivity Analysis 1: Impact of Vaccination Coverage on Attack Rate",
-    
+
     x        = "County-Wide Vaccination Coverage (%)",
     y        = "Average Final Attack Rate (%)",
     color    = "School Size Category"
   )
-
-
-# SENSITIVITY ANALYSIS 2: ROLE OF HIGH-CENTRALITY (HUB) SCHOOLS
 
 net_graph       <- graph_from_adjacency_matrix(A, mode = "undirected", weighted = TRUE)
 df$node_strength <- strength(net_graph)
@@ -254,7 +237,6 @@ low_hub_id   <- df$school_id[which.min(df$node_strength)]
 top_hub_name <- df$school_name[df$school_id == top_hub_id]
 low_hub_name <- df$school_name[df$school_id == low_hub_id]
 
-###actual coverage
 R0_actual <- round(N * df$vax_rate)
 
 I0_hub <- rep(0, n_schools); I0_hub[top_hub_id] <- 1
@@ -285,8 +267,7 @@ ggplot(comparison_df, aes(x = time, y = total_infectious, color = Scenario)) +
   ) +
   theme(legend.position = "bottom")
 
-#  Controlled Coverage (Fix both seed schools to 74% coverage)
-fixed_vax_rate <- 0.74 
+fixed_vax_rate <- 0.74
 R0_controlled  <- round(N * df$vax_rate)
 R0_controlled[top_hub_id] <- round(N[top_hub_id] * fixed_vax_rate)
 R0_controlled[low_hub_id] <- round(N[low_hub_id] * fixed_vax_rate)
@@ -313,8 +294,6 @@ ggplot(comparison_ctrl_df, aes(x = time, y = total_infectious, color = Scenario)
     y        = "Total Active Infectious Cases in County"
   )
 
-# SENSITIVITY ANALYSIS 3: REDUCING INTER-SCHOOL CONNECTIVITY
-
 alpha_scenarios <- c(
   "Baseline (0% Reduction)"               = alpha,
   "Moderate Restrictions (50% Reduction)" = alpha * 0.50,
@@ -325,7 +304,7 @@ results_list <- list()
 for (scen_name in names(alpha_scenarios)) {
   params_scen       <- params
   params_scen$alpha <- alpha_scenarios[[scen_name]]
-  
+
   out_scen <- as.data.frame(ode(y = state_hub, times = times, func = seir_model, parms = params_scen))
   results_list[[scen_name]] <- get_total_I(out_scen, scen_name)
 }
@@ -343,9 +322,6 @@ ggplot(sens3_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
     y        = "Total Active Infectious Cases in County"
   ) +
   theme(legend.position = "bottom")
-
-
-#  SENSITIVITY ANALYSIS 4: TARGETED VS. RANDOM VACCINATION
 
 set.seed(123)
 
@@ -374,19 +350,14 @@ ggplot(sens4_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   ) +
   theme(legend.position = "bottom")
 
-
-#  SENSITIVITY ANALYSIS 5: VACCINATION COVERAGE BY SCHOOL SIZE
-
 target_county_mean <- mean(df$vax_rate)
 small_idx          <- which(df$total_students < 400)
 large_idx          <- which(df$total_students >= 400)
 
-# Scenario A: Low Vax in Small Schools, High Vax in Large Schools
 vax_small_low <- numeric(n_schools)
 vax_small_low[small_idx] <- 0.70; vax_small_low[large_idx] <- 0.95
 vax_small_low <- pmin(0.98, pmax(0.40, vax_small_low * (target_county_mean / mean(vax_small_low))))
 
-# Scenario B: High Vax in Small Schools, Low Vax in Large Schools
 vax_large_low <- numeric(n_schools)
 vax_large_low[small_idx] <- 0.95; vax_large_low[large_idx] <- 0.70
 vax_large_low <- pmin(0.98, pmax(0.40, vax_large_low * (target_county_mean / mean(vax_large_low))))
@@ -402,14 +373,11 @@ ggplot(sens6_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   scale_linetype_manual(values = c("solid", "dashed")) +
   labs(
     title    = "Sensitivity Analysis 5: Impact of Vaccine Distribution by School Size",
-    
+
     x        = "Days Since Outbreak Introduction",
     y        = "Total Active Infectious Cases in County"
   ) +
   theme(legend.position = "bottom")
-
-
-#  SENSITIVITY ANALYSIS 6: REACTIVE SCHOOL CLOSURE
 
 run_closure_scenario <- function(threshold_cases, label) {
   p_temp         <- params
@@ -417,17 +385,17 @@ run_closure_scenario <- function(threshold_cases, label) {
   curr_state     <- initial_state
   history_list   <- list()
   closed_schools <- c()
-  
+
   times_sim <- seq(0, 200, by = 1)
-  
+
   for (t_idx in 1:(length(times_sim) - 1)) {
     t_start  <- times_sim[t_idx]
     t_end    <- times_sim[t_idx + 1]
     step_out <- as.data.frame(ode(y = curr_state, times = c(t_start, t_end), func = seir_model, parms = p_temp))
-    
+
     curr_state <- unlist(step_out[2, 2:ncol(step_out)])
     I_counts   <- curr_state[(2 * n_schools + 1):(3 * n_schools)]
-    
+
     newly_closed <- which(I_counts >= threshold_cases & !(1:n_schools %in% closed_schools))
     if (length(newly_closed) > 0 && threshold_cases < Inf) {
       closed_schools <- c(closed_schools, newly_closed)
@@ -439,7 +407,7 @@ run_closure_scenario <- function(threshold_cases, label) {
     }
     history_list[[t_idx]] <- step_out[1, ]
   }
-  
+
   full_out <- bind_rows(history_list)
   get_total_I(full_out, label)
 }
@@ -456,14 +424,11 @@ ggplot(sens7_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   labs(
     title    = "Sensitivity Analysis 6: Reactive School Closure Interventions",
     subtitle = "Dynamic Network Node Isolation at Triggered Thresholds",
-    x        = "Days Since Outbreak Introduction", 
+    x        = "Days Since Outbreak Introduction",
     y        = "Total Active Infectious Cases",
     color    = "Intervention Policy"
   ) +
   theme(legend.position = "bottom")
-
-
-#  SENSITIVITY ANALYSIS 7: REACTIVE RING VS. MASS VACCINATION
 
 day_trigger      <- 14
 vax_boost_amount <- 0.15
@@ -501,35 +466,32 @@ ggplot(sens8_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   geom_line(linewidth = 1.3) +
   scale_color_manual(values = c("firebrick", "forestgreen", "darkblue")) +
   geom_vline(xintercept = day_trigger, linetype = "dotted", color = "black") +
-  annotate("text", x = day_trigger + 2, y = max(sens8_df$total_infectious) * 0.9, 
+  annotate("text", x = day_trigger + 2, y = max(sens8_df$total_infectious) * 0.9,
            label = "Vaccination Trigger (Day 14)", angle = 90, hjust = 1) +
   labs(
     title    = "Sensitivity Analysis 7: Reactive Ring vs. Mass-Size Vaccination",
     subtitle = "Post-Exposure Intervention Triggered at Day 14 (Seeded at Top Hub)",
-    x        = "Days Since Outbreak Introduction", 
+    x        = "Days Since Outbreak Introduction",
     y        = "Total Active Infectious Cases"
   ) +
   theme(legend.position = "bottom")
-
-
-#  SENSITIVITY ANALYSIS 8: PHASED INTER-SCHOOL TRAVEL RESTRICTIONS
 
 run_phased_alpha <- function(alpha_schedule, label) {
   curr_state   <- initial_state
   p_temp       <- params
   history_list <- list()
   times_sim    <- seq(0, 200, by = 1)
-  
+
   for (t_idx in 1:(length(times_sim) - 1)) {
     t_start      <- times_sim[t_idx]
     t_end        <- times_sim[t_idx + 1]
     p_temp$alpha <- alpha_schedule(t_start)
-    
+
     step_out   <- as.data.frame(ode(y = curr_state, times = c(t_start, t_end), func = seir_model, parms = p_temp))
     curr_state <- unlist(step_out[2, 2:ncol(step_out)])
     history_list[[t_idx]] <- step_out[1, ]
   }
-  
+
   full_out <- bind_rows(history_list)
   get_total_I(full_out, label)
 }
@@ -556,24 +518,6 @@ ggplot(sens9_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   ) +
   theme(legend.position = "bottom")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ==============================================================================
-# SENSITIVITY ANALYSIS 5: VACCINE ALLOCATION BY SCHOOL SIZE VS. BASELINES
-# ==============================================================================
-
-# 1. School classification and student totals
 small_idx <- which(df$total_students < 400)
 large_idx <- which(df$total_students >= 400)
 
@@ -581,10 +525,6 @@ N_small <- sum(df$total_students[small_idx])
 N_large <- sum(df$total_students[large_idx])
 N_total <- sum(df$total_students)
 
-# ------------------------------------------------------------------------------
-# 2. Size-Based Allocations (75% / 90% Parameter Set)
-# ------------------------------------------------------------------------------
-# Scenario A: Low Coverage in Small Schools (75%), High in Large (90%)
 vax_small_low <- numeric(n_schools)
 vax_small_low[small_idx] <- 0.75
 vax_small_low[large_idx] <- 0.90
@@ -592,7 +532,6 @@ vax_small_low[large_idx] <- 0.90
 total_vax_A <- sum(df$total_students * vax_small_low)
 rate_A      <- total_vax_A / N_total
 
-# Scenario B: Low Coverage in Large Schools (75%), Solve Small to Match Scenario A
 vax_small_B_needed <- (total_vax_A - (0.75 * N_large)) / N_small
 
 vax_large_low <- numeric(n_schools)
@@ -602,9 +541,6 @@ vax_large_low[small_idx] <- vax_small_B_needed
 total_vax_B <- sum(df$total_students * vax_large_low)
 rate_B      <- total_vax_B / N_total
 
-# ------------------------------------------------------------------------------
-# 3. Uniform Baselines (70%, 80%, 90% Across All Schools)
-# ------------------------------------------------------------------------------
 vax_70 <- rep(0.70, n_schools)
 vax_80 <- rep(0.80, n_schools)
 vax_90 <- rep(0.90, n_schools)
@@ -617,9 +553,6 @@ rate_70 <- total_vax_70 / N_total
 rate_80 <- total_vax_80 / N_total
 rate_90 <- total_vax_90 / N_total
 
-# ------------------------------------------------------------------------------
-# 4. Console Verification Summary
-# ------------------------------------------------------------------------------
 aggregate_summary <- data.frame(
   Scenario = c(
     "Baseline: Uniform 70%",
@@ -648,9 +581,6 @@ cat("\n=== COUNTY-WIDE AGGREGATE COVERAGE SUMMARY ===\n")
 print(aggregate_summary)
 cat("===============================================\n\n")
 
-# ------------------------------------------------------------------------------
-# 5. Run Model Simulations
-# ------------------------------------------------------------------------------
 sens5_df <- bind_rows(
   run_vax_scenario(vax_70,        "Baseline: Uniform 70%",                     seed_id = top_hub_id),
   run_vax_scenario(vax_80,        "Baseline: Uniform 80%",                     seed_id = top_hub_id),
@@ -659,9 +589,6 @@ sens5_df <- bind_rows(
   run_vax_scenario(vax_large_low, "Allocated: High in Small / Low in Large", seed_id = top_hub_id)
 )
 
-# ------------------------------------------------------------------------------
-# 6. Comparative Plotting
-# ------------------------------------------------------------------------------
 ggplot(sens5_df, aes(x = time, y = total_infectious, color = Scenario, linetype = Scenario)) +
   geom_line(linewidth = 1.2) +
   scale_color_manual(values = c(
@@ -690,25 +617,7 @@ ggplot(sens5_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   ) +
   guides(color = guide_legend(nrow = 2, byrow = TRUE))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ==============================================================================
-# SENSITIVITY ANALYSIS 5: VACCINE ALLOCATION (89 SCHOOLS NETWORK)
-# ==============================================================================
-
-# 1. School Classification for 89 Schools
-n_schools <- nrow(df) # Confirms 89 schools
+n_schools <- nrow(df)
 
 small_idx <- which(df$total_students < 400)
 large_idx <- which(df$total_students >= 400)
@@ -717,7 +626,6 @@ N_small <- sum(df$total_students[small_idx])
 N_large <- sum(df$total_students[large_idx])
 N_total <- sum(df$total_students)
 
-# 2. Scenario A: Low in Small (75%), High in Large (90%)
 vax_small_low <- numeric(n_schools)
 vax_small_low[small_idx] <- 0.75
 vax_small_low[large_idx] <- 0.90
@@ -725,7 +633,6 @@ vax_small_low[large_idx] <- 0.90
 total_vax_A <- sum(df$total_students * vax_small_low)
 rate_A      <- total_vax_A / N_total
 
-# 3. Scenario B: Low in Large (75%), Solved Rate in Small
 vax_small_B_needed <- (total_vax_A - (0.75 * N_large)) / N_small
 
 vax_large_low <- numeric(n_schools)
@@ -735,12 +642,10 @@ vax_large_low[small_idx] <- vax_small_B_needed
 total_vax_B <- sum(df$total_students * vax_large_low)
 rate_B      <- total_vax_B / N_total
 
-# 4. Uniform Baselines
 vax_70 <- rep(0.70, n_schools)
 vax_80 <- rep(0.80, n_schools)
 vax_90 <- rep(0.90, n_schools)
 
-# 5. Verification Output
 cat("Total Schools in Analysis:", n_schools, "\n")
 cat("Aggregate Coverage Scenario A:", round(rate_A * 100, 4), "%\n")
 cat("Aggregate Coverage Scenario B:", round(rate_B * 100, 4), "%\n")

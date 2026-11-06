@@ -1,9 +1,6 @@
 library(tidyverse)
 library(deSolve)
 
-# ==========================================
-# 1. LOAD & PREPARE SCHOOL DATA
-# ==========================================
 df <- read.csv("data/processed/school_data_joined.csv")
 names(df) <- tolower(names(df))
 
@@ -22,9 +19,6 @@ df <- df %>%
 
 n_schools <- nrow(df)
 
-# ==========================================
-# 2. BUILD NETWORK ADJACENCY MATRIX (A)
-# ==========================================
 net_df <- read.csv("data/processed/network_df.csv")
 names(net_df) <- tolower(names(net_df))
 
@@ -63,20 +57,17 @@ spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))
 if (!is.finite(spectral_radius) || spectral_radius <= 0) {
   stop("The network spectral radius is zero or invalid.")
 }
-A <- A / spectral_radius  
+A <- A / spectral_radius
 
-# ==========================================
-# 3. BASELINE MODEL PARAMETERS
-# ==========================================
-gamma_rate <- 1 / 7                    # Infectious period (~7 days)
-sigma_rate <- 1 / 10                   # Incubation period (~10 days)
-beta_rate  <- 15 * gamma_rate          # Intra-school transmission (R0 = 15)
-alpha      <- 0.05                     # Inter-school coupling coefficient (5%)
+gamma_rate <- 1 / 7
+sigma_rate <- 1 / 10
+beta_rate  <- 15 * gamma_rate
+alpha      <- 0.05
 times      <- seq(0, 200, by = 1)
 
 N <- df$total_students
 R0_count <- round(N * df$vax_rate)
-I0_count <- c(1, rep(0, n_schools - 1)) # Index case in School 1
+I0_count <- c(1, rep(0, n_schools - 1))
 E0_count <- rep(0, n_schools)
 S0_count <- pmax(0, N - I0_count - E0_count - R0_count)
 
@@ -98,32 +89,26 @@ params <- list(
   n     = n_schools
 )
 
-# ==========================================
-# 4. SEIR NETWORK ODE FUNCTION
-# ==========================================
 seir_model <- function(time, state, parameters) {
   with(as.list(parameters), {
     S <- state[1:n]
     E <- state[(n + 1):(2 * n)]
     I <- state[(2 * n + 1):(3 * n)]
     R <- state[(3 * n + 1):(4 * n)]
-    
+
     I_prop <- I / N
-    # Force of infection combining Intra- and Inter-school rates
+
     lambda <- (beta * I_prop) + (alpha * beta * as.vector(A %*% I_prop))
-    
+
     dS <- - lambda * S
     dE <-   lambda * S - (sigma * E)
     dI <-  (sigma * E) - (gamma * I)
     dR <-  (gamma * I)
-    
+
     return(list(c(dS, dE, dI, dR)))
   })
 }
 
-# ==========================================
-# 5. BASELINE SIMULATION & PLOTS
-# ==========================================
 output <- ode(y = initial_state, times = times, func = seir_model, parms = params)
 
 results_long <- as.data.frame(output) %>%
@@ -139,7 +124,7 @@ total_pages <- max(df$page)
 
 for (p in 1:total_pages) {
   page_data <- results_long %>% filter(page == p)
-  
+
   p_plot <- ggplot(page_data, aes(x = time, y = Count, color = Compartment)) +
     geom_line(linewidth = 1) +
     scale_color_manual(
@@ -153,18 +138,10 @@ for (p in 1:total_pages) {
     ) +
     theme_minimal() +
     theme(strip.text = element_text(size = 8, face = "bold"), legend.position = "bottom")
-  
+
   print(p_plot)
 }
 
-
-# ==============================================================================
-# 6. SENSITIVITY ANALYSIS: VACCINATION COVERAGE vs. SCHOOL SIZE
-# ==============================================================================
-# Here we systematically test different vaccination coverage levels (70% - 98%)
-# while keeping full network intra + inter force of infection active.
-
-# A. Categorize schools by student enrollment size
 df_sens <- df %>%
   mutate(
     school_size_cat = case_when(
@@ -174,45 +151,39 @@ df_sens <- df %>%
     )
   )
 
-# B. Define sensitivity coverage grid
 vax_scenarios <- c(0.70, 0.80, 0.85, 0.90, 0.95, 0.98)
 sens_results <- data.frame()
 
-# C. Loop over vaccination scenarios
 for (v_cov in vax_scenarios) {
-  
-  # Set uniform initial vaccination across all schools
+
   R0_sens <- round(N * v_cov)
-  I0_sens <- c(1, rep(0, n_schools - 1)) # Seed in School 1
+  I0_sens <- c(1, rep(0, n_schools - 1))
   E0_sens <- rep(0, n_schools)
   S0_sens <- pmax(0, N - I0_sens - E0_sens - R0_sens)
-  
+
   state_sens <- c(S0_sens, E0_sens, I0_sens, R0_sens)
   names(state_sens) <- names(initial_state)
-  
-  # Run ODE solver for this scenario
+
   out_sens <- ode(y = state_sens, times = times, func = seir_model, parms = params)
-  
-  # Process ODE output to calculate attack rate per school
+
   res_sens <- as.data.frame(out_sens) %>%
     pivot_longer(cols = -time, names_to = "var", values_to = "Count") %>%
     mutate(
       Compartment = str_extract(var, "^[SEIR]"),
       school_id   = as.numeric(str_extract(var, "\\d+"))
     ) %>%
-    filter(time == max(times)) %>% # Take final day to get total recovered/infected
+    filter(time == max(times)) %>%
     pivot_wider(names_from = Compartment, values_from = Count) %>%
     left_join(df_sens, by = "school_id") %>%
     mutate(
-      total_cases = R - (total_students * v_cov), # Subtract initial vaccinated
+      total_cases = R - (total_students * v_cov),
       attack_rate = (pmax(0, total_cases) / total_students) * 100,
       scenario_vax = paste0(v_cov * 100, "%")
     )
-  
+
   sens_results <- rbind(sens_results, res_sens)
 }
 
-# D. Plot Sensitivity 1: Attack Rate vs. Vaccination Coverage grouped by School Size
 sens_summary <- sens_results %>%
   group_by(scenario_vax, school_size_cat) %>%
   summarise(
@@ -226,7 +197,7 @@ ggplot(sens_summary, aes(x = vax_num, y = avg_attack_rate, color = school_size_c
   geom_line(linewidth = 1.2) +
   geom_point(size = 3) +
   geom_vline(xintercept = 95, linetype = "dashed", color = "red") +
-  annotate("text", x = 95.5, y = max(sens_summary$avg_attack_rate) * 0.9, 
+  annotate("text", x = 95.5, y = max(sens_summary$avg_attack_rate) * 0.9,
            label = "95% Herd Immunity Target", color = "red", angle = 90) +
   labs(
     title = "Sensitivity Analysis 1: Impact of Vaccination Coverage on Attack Rate",
@@ -238,34 +209,13 @@ ggplot(sens_summary, aes(x = vax_num, y = avg_attack_rate, color = school_size_c
   theme_minimal() +
   theme(plot.title = element_text(face = "bold", size = 12))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 library(igraph)
 
-# ==============================================================================
-# 7. SENSITIVITY ANALYSIS 2: ROLE OF HIGH-CENTRALITY (HUB) SCHOOLS
-# ==============================================================================
-
-# A. Build graph and calculate Node Strength centrality
 net_graph <- graph_from_adjacency_matrix(A, mode = "undirected", weighted = TRUE)
 
 df$node_strength <- strength(net_graph)
 df$betweenness   <- betweenness(net_graph, weights = NA)
 
-# B. Identify Top Hub and Peripheral Schools
 top_hub_id   <- df$school_id[which.max(df$node_strength)]
 low_hub_id   <- df$school_id[which.min(df$node_strength)]
 top_hub_name <- df$school_name[df$school_id == top_hub_id]
@@ -274,10 +224,8 @@ low_hub_name <- df$school_name[df$school_id == low_hub_id]
 cat("Top Hub School:", top_hub_name, "| Vax Rate:", round(df$vax_rate[df$school_id == top_hub_id]*100, 1), "%\n")
 cat("Peripheral School:", low_hub_name, "| Vax Rate:", round(df$vax_rate[df$school_id == low_hub_id]*100, 1), "%\n")
 
-# C. Define Seeding Scenarios using ACTUAL dataset vaccination coverage (df$vax_rate)
 R0_actual <- round(N * df$vax_rate)
 
-# Scenario A: Seed index case (I0 = 1) in Top Centrality Hub School
 I0_hub <- rep(0, n_schools)
 I0_hub[top_hub_id] <- 1
 S0_hub <- pmax(0, N - I0_hub - R0_actual)
@@ -285,7 +233,6 @@ S0_hub <- pmax(0, N - I0_hub - R0_actual)
 state_hub <- c(S0_hub, rep(0, n_schools), I0_hub, R0_actual)
 names(state_hub) <- names(initial_state)
 
-# Scenario B: Seed index case (I0 = 1) in Peripheral School
 I0_peri <- rep(0, n_schools)
 I0_peri[low_hub_id] <- 1
 S0_peri <- pmax(0, N - I0_peri - R0_actual)
@@ -293,11 +240,9 @@ S0_peri <- pmax(0, N - I0_peri - R0_actual)
 state_peri <- c(S0_peri, rep(0, n_schools), I0_peri, R0_actual)
 names(state_peri) <- names(initial_state)
 
-# D. Run SEIR Network Simulations
 out_hub  <- as.data.frame(ode(y = state_hub,  times = times, func = seir_model, parms = params))
 out_peri <- as.data.frame(ode(y = state_peri, times = times, func = seir_model, parms = params))
 
-# E. Extract Total Active Infectious Cases County-Wide
 get_total_I <- function(out_df, scenario_label) {
   out_df %>%
     pivot_longer(cols = -time, names_to = "var", values_to = "Count") %>%
@@ -312,7 +257,6 @@ peri_curve <- get_total_I(out_peri, paste0("Peripheral : ", low_hub_name))
 
 comparison_df <- rbind(hub_curve, peri_curve)
 
-# F. Plot Epidemic Curves
 ggplot(comparison_df, aes(x = time, y = total_infectious, color = Scenario)) +
   geom_line(linewidth = 1.3) +
   scale_color_manual(values = c("firebrick", "darkblue")) +
@@ -329,39 +273,26 @@ ggplot(comparison_df, aes(x = time, y = total_infectious, color = Scenario)) +
     legend.position = "bottom"
   )
 
+fixed_vax_rate <- 0.74
 
-
-
-
-
-
-# Controlled Test: Set BOTH seed schools to 74% coverage to remove the vax rate confounder
-fixed_vax_rate <- 0.74 
-
-# Base vaccination array from dataset
 R0_controlled <- round(N * df$vax_rate)
 
-# Force BOTH the Hub and Peripheral seed schools to have the exact same 74% coverage
 R0_controlled[top_hub_id] <- round(N[top_hub_id] * fixed_vax_rate)
 R0_controlled[low_hub_id] <- round(N[low_hub_id] * fixed_vax_rate)
 
-# Scenario A: Seed in Hub (with 74% vax)
 I0_hub <- rep(0, n_schools); I0_hub[top_hub_id] <- 1
 S0_hub <- pmax(0, N - I0_hub - R0_controlled)
 state_hub <- c(S0_hub, rep(0, n_schools), I0_hub, R0_controlled)
 names(state_hub) <- names(initial_state)
 
-# Scenario B: Seed in Peripheral (also with 74% vax)
 I0_peri <- rep(0, n_schools); I0_peri[low_hub_id] <- 1
 S0_peri <- pmax(0, N - I0_peri - R0_controlled)
 state_peri <- c(S0_peri, rep(0, n_schools), I0_peri, R0_controlled)
 names(state_peri) <- names(initial_state)
 
-# Run Simulations
 out_hub_ctrl  <- as.data.frame(ode(y = state_hub,  times = times, func = seir_model, parms = params))
 out_peri_ctrl <- as.data.frame(ode(y = state_peri, times = times, func = seir_model, parms = params))
 
-# Extract & Plot
 hub_curve_ctrl  <- get_total_I(out_hub_ctrl,  paste0("Hub Seed (74% Vax): ", top_hub_name))
 peri_curve_ctrl <- get_total_I(out_peri_ctrl, paste0("Peripheral Seed (74% Vax): ", low_hub_name))
 
@@ -378,11 +309,6 @@ ggplot(comparison_ctrl_df, aes(x = time, y = total_infectious, color = Scenario)
   ) +
   theme_minimal()
 
-
-
-
-
-
 cat("================ CONNECTIVITY FIGURES ================\n")
 cat("HUB SCHOOL:", top_hub_name, "\n")
 cat("  - Node Strength (Risk Score):", df$node_strength[top_hub_id], "\n")
@@ -395,8 +321,6 @@ cat("  - Betweenness Centrality:   ", df$betweenness[low_hub_id], "\n")
 cat("  - Number of Connected Schools:", sum(A[low_hub_id, ] > 0), "\n")
 cat("======================================================\n")
 
-
-# Check St. Paul's non-zero connections
 st_paul_edges <- data.frame(
   Neighbor_School = df$school_name,
   Weight = A[low_hub_id, ]
@@ -404,15 +328,6 @@ st_paul_edges <- data.frame(
 
 print(st_paul_edges)
 
-
-
-
-
-# ==============================================================================
-# CONNECTIVITY RISK ANALYSIS FOR PERIPHERAL NODES
-# ==============================================================================
-
-# 1. Connectivity Details for St. Paul (or current min-strength school)
 peripheral_details <- data.frame(
   School_ID      = low_hub_id,
   School_Name    = low_hub_name,
@@ -425,7 +340,6 @@ peripheral_details <- data.frame(
 print("--- PERIPHERAL NODE SUMMARY ---")
 print(peripheral_details)
 
-# 2. View the Bottom 10 Schools Ranked by Connectivity Risk (Node Strength)
 bottom_10_connectivity <- df %>%
   select(school_id, school_name, node_strength, vax_rate) %>%
   arrange(node_strength) %>%
@@ -434,26 +348,12 @@ bottom_10_connectivity <- df %>%
 print("--- BOTTOM 10 LOWEST CONNECTIVITY SCHOOLS ---")
 print(bottom_10_connectivity)
 
-# 3. Check if St. Paul has ANY outgoing or incoming edge connections in raw matrix A
 raw_outgoing <- sum(A[low_hub_id, ] > 0)
 raw_incoming <- sum(A[, low_hub_id] > 0)
 
 cat("\nOutgoing connections from peripheral node:", raw_outgoing, "\n")
 cat("Incoming connections to peripheral node:  ", raw_incoming, "\n")
 
-
-
-
-
-
-
-
-# ==============================================================================
-# 9. SENSITIVITY ANALYSIS 3: REDUCING INTER-SCHOOL CONNECTIVITY
-# ==============================================================================
-
-# A. Define Coupling Coefficients (Alpha values representing connectivity levels)
-# Baseline alpha is 0.05 (100% mobility)
 alpha_baseline <- 0.05
 alpha_scenarios <- c(
   "Baseline (0% Reduction)" = alpha_baseline,
@@ -461,7 +361,6 @@ alpha_scenarios <- c(
   "Full School Isolation (100% Reduction)" = 0.0
 )
 
-# B. Set up Seeding in High-Centrality Hub School (using actual vax coverage)
 R0_base <- round(N * df$vax_rate)
 I0_hub  <- rep(0, n_schools)
 I0_hub[top_hub_id] <- 1
@@ -470,27 +369,21 @@ S0_hub  <- pmax(0, N - I0_hub - R0_base)
 state_init <- c(S0_hub, rep(0, n_schools), I0_hub, R0_base)
 names(state_init) <- names(initial_state)
 
-# C. Loop through Connectivity Reduction Scenarios
 results_list <- list()
 
 for (scen_name in names(alpha_scenarios)) {
-  
-  # Copy baseline parameters and adjust alpha
+
   params_scen <- params
   params_scen$alpha <- alpha_scenarios[[scen_name]]
-  
-  # Run ODE Simulation
+
   out_scen <- as.data.frame(ode(y = state_init, times = times, func = seir_model, parms = params_scen))
-  
-  # Calculate Total County-Wide Infectious Cases
+
   df_I <- get_total_I(out_scen, scen_name)
   results_list[[scen_name]] <- df_I
 }
 
-# Combine all scenario results into one dataframe
 sens3_df <- bind_rows(results_list)
 
-# D. Plot Comparative Epidemic Curves for Connectivity Reduction
 ggplot(sens3_df, aes(x = time, y = total_infectious, color = Scenario, linetype = Scenario)) +
   geom_line(linewidth = 1.3) +
   scale_color_manual(values = c(
@@ -513,67 +406,45 @@ ggplot(sens3_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
     legend.position = "bottom"
   )
 
+set.seed(123)
 
-
-
-
-
-
-
-
-
-
-# ==============================================================================
-# 10. SENSITIVITY ANALYSIS 4: TARGETED VS. RANDOM VACCINATION
-# ==============================================================================
-
-set.seed(123) # For reproducible random selection
-
-# Identify Top 5 High-Centrality Hub Schools
 top_5_hubs <- df %>%
   arrange(desc(node_strength)) %>%
   slice(1:5) %>%
   pull(school_id)
 
-# Select 5 Random Non-Hub Schools for Comparison
 random_5_schools <- df %>%
   filter(!school_id %in% top_5_hubs) %>%
   sample_n(5) %>%
   pull(school_id)
 
-# A. Baseline Setup (Actual Dataset Coverage)
 vax_base <- df$vax_rate
 
-# B. Scenario 1: Targeted Vaccination (Boost Top 5 Hubs to 95% Coverage)
 vax_targeted <- vax_base
 vax_targeted[top_5_hubs] <- pmax(vax_targeted[top_5_hubs], 0.95)
 
-# C. Scenario 2: Random Vaccination (Boost 5 Random Schools to 95% Coverage)
 vax_random <- vax_base
 vax_random[random_5_schools] <- pmax(vax_random[random_5_schools], 0.95)
 
-# Function to run ODE and get epidemic curve seeded at top hub
 run_vax_scenario <- function(vax_vector, label) {
   R0_vec <- round(N * vax_vector)
   I0_vec <- rep(0, n_schools)
   I0_vec[top_hub_id] <- 1
   S0_vec <- pmax(0, N - I0_vec - R0_vec)
-  
+
   state_vec <- c(S0_vec, rep(0, n_schools), I0_vec, R0_vec)
   names(state_vec) <- names(initial_state)
-  
+
   out_df <- as.data.frame(ode(y = state_vec, times = times, func = seir_model, parms = params))
   get_total_I(out_df, label)
 }
 
-# D. Run All Three Scenarios
 curve_baseline <- run_vax_scenario(vax_base,     "Baseline (Actual Coverage)")
 curve_targeted <- run_vax_scenario(vax_targeted, "Targeted (Top 5 Hubs Raised to 95%)")
 curve_random   <- run_vax_scenario(vax_random,   "Random (5 Random Schools Raised to 95%)")
 
 sens4_df <- rbind(curve_baseline, curve_targeted, curve_random)
 
-# E. Plot Comparative Epidemic Curves
 ggplot(sens4_df, aes(x = time, y = total_infectious, color = Scenario, linetype = Scenario)) +
   geom_line(linewidth = 1.3) +
   scale_color_manual(values = c(
@@ -596,55 +467,28 @@ ggplot(sens4_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
     legend.position = "bottom"
   )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ==============================================================================
-# 11. SENSITIVITY ANALYSIS 6: VACCINATION COVERAGE BY SCHOOL SIZE
-# (Maintaining Identical County-Wide Overall Vaccination Coverage)
-# ==============================================================================
-
-# A. Calculate Baseline County Average Vaccination Rate
 target_county_mean <- mean(df$vax_rate)
 
-# B. Classify Schools into Small (<400) and Large (>=400)
 small_idx <- which(df$total_students < 400)
 large_idx <- which(df$total_students >= 400)
 
 n_small <- length(small_idx)
 n_large <- length(large_idx)
 
-# --- SCENARIO A: Low Vax in Small Schools, High Vax in Large Schools ---
-# Set initial targets: 70% for small schools, 95% for large schools
 vax_small_low <- numeric(n_schools)
 vax_small_low[small_idx] <- 0.70
 vax_small_low[large_idx] <- 0.95
 
-# Rescale proportionally to match exact county mean coverage
 vax_small_low <- vax_small_low * (target_county_mean / mean(vax_small_low))
 vax_small_low <- pmin(0.98, pmax(0.40, vax_small_low))
 
-# --- SCENARIO B: High Vax in Small Schools, Low Vax in Large Schools ---
-# Set initial targets: 95% for small schools, 70% for large schools
 vax_large_low <- numeric(n_schools)
 vax_large_low[small_idx] <- 0.95
 vax_large_low[large_idx] <- 0.70
 
-# Rescale proportionally to match exact county mean coverage
 vax_large_low <- vax_large_low * (target_county_mean / mean(vax_large_low))
 vax_large_low <- pmin(0.98, pmax(0.40, vax_large_low))
 
-# C. Console Verification
 cat("=== SENSITIVITY 6 COVERAGE VERIFICATION ===\n")
 cat("County Mean Target:                ", round(target_county_mean * 100, 2), "%\n")
 cat("Scenario A (Low Small / High Large):", round(mean(vax_small_low) * 100, 2), "%\n")
@@ -655,13 +499,11 @@ cat("  - Small Schools Avg Vax:         ", round(mean(vax_large_low[small_idx]) 
 cat("  - Large Schools Avg Vax:         ", round(mean(vax_large_low[large_idx]) * 100, 2), "%\n")
 cat("===========================================\n")
 
-# D. Run SEIR Network Simulations (Seeded at Top Hub)
 curve_small_low <- run_vax_scenario(vax_small_low, "Low Coverage in Small / High in Large")
 curve_large_low <- run_vax_scenario(vax_large_low, "High Coverage in Small / Low in Large")
 
 sens6_df <- rbind(curve_small_low, curve_large_low)
 
-# E. Plot Comparative Epidemic Curves
 ggplot(sens6_df, aes(x = time, y = total_infectious, color = Scenario, linetype = Scenario)) +
   geom_line(linewidth = 1.3) +
   scale_color_manual(values = c(
@@ -683,86 +525,41 @@ ggplot(sens6_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
     legend.position = "bottom"
   )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ==========================================
-# HELPER FUNCTIONS FOR INTERVENTION SCENARIOS
-# ==========================================
-
-# Standardized function to run events/interventions in deSolve
 run_intervention_sim <- function(init_state, parms_list, times_seq, event_df = NULL) {
   if (!is.null(event_df)) {
-    out <- ode(y = init_state, times = times_seq, func = seir_model, 
+    out <- ode(y = init_state, times = times_seq, func = seir_model,
                parms = parms_list, events = list(data = event_df))
   } else {
-    out <- ode(y = init_state, times = times_seq, func = seir_model, 
+    out <- ode(y = init_state, times = times_seq, func = seir_model,
                parms = parms_list)
   }
   return(as.data.frame(out))
 }
 
-
-# ==============================================================================
-# SENSITIVITY ANALYSIS 7: REACTIVE SCHOOL CLOSURE (NETWORK EDGE REMOVAL)
-# ==============================================================================
-# Evaluates dynamic isolation of schools once internal cases breach a threshold.
-
 run_closure_scenario <- function(threshold_cases, label) {
-  # Copy parameters
+
   p_temp <- params
   A_dynamic <- p_temp$A
-  
-  # Tracking arrays
+
   times_sim <- seq(0, 200, by = 1)
   curr_state <- initial_state
-  
+
   history_list <- list()
   closed_schools <- c()
-  
+
   for (t_idx in 1:(length(times_sim) - 1)) {
     t_start <- times_sim[t_idx]
     t_end   <- times_sim[t_idx + 1]
-    
-    # Run 1-day step
-    step_out <- as.data.frame(ode(y = curr_state, times = c(t_start, t_end), 
+
+    step_out <- as.data.frame(ode(y = curr_state, times = c(t_start, t_end),
                                   func = seir_model, parms = p_temp))
-    
-    # Update current state to end of step
+
     curr_state <- unlist(step_out[2, 2:ncol(step_out)])
-    
-    # Check infectious counts per school
+
     I_counts <- curr_state[(2 * n_schools + 1):(3 * n_schools)]
-    
-    # Identify newly breached schools
+
     newly_closed <- which(I_counts >= threshold_cases & !(1:n_schools %in% closed_schools))
-    
+
     if (length(newly_closed) > 0 && threshold_cases < Inf) {
       closed_schools <- c(closed_schools, newly_closed)
       for (sch in newly_closed) {
@@ -771,11 +568,10 @@ run_closure_scenario <- function(threshold_cases, label) {
       }
       p_temp$A <- A_dynamic
     }
-    
-    # Store daily snapshot
+
     history_list[[t_idx]] <- step_out[1, ]
   }
-  
+
   full_out <- bind_rows(history_list)
   get_total_I(full_out, label)
 }
@@ -798,25 +594,16 @@ ggplot(sens7_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   theme_minimal() +
   theme(plot.title = element_text(face = "bold", size = 11), legend.position = "bottom")
 
-
-# ==============================================================================
-# SENSITIVITY ANALYSIS 8: PRIORITY RING VS. MASS REACTION VACCINATION
-# ==============================================================================
-# Triggers post-exposure vaccination at Day 14 targeting ring neighbors vs large schools.
-
 day_trigger <- 14
-vax_boost_amount <- 0.15 # 15% boost to susceptible population
+vax_boost_amount <- 0.15
 
-# Base initial conditions seeded at Top Hub
 R0_base <- round(N * df$vax_rate)
 I0_hub  <- rep(0, n_schools); I0_hub[top_hub_id] <- 1
 S0_hub  <- pmax(0, N - I0_hub - R0_base)
 
-# Identify Targets
 ring_targets <- as.numeric(neighbors(net_graph, top_hub_id))
 size_targets <- df %>% arrange(desc(total_students)) %>% slice(1:length(ring_targets)) %>% pull(school_id)
 
-# Event Generation Function
 create_vax_events <- function(target_nodes, trigger_day) {
   events <- data.frame()
   for (node in target_nodes) {
@@ -856,7 +643,7 @@ ggplot(sens8_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   geom_line(linewidth = 1.3) +
   scale_color_manual(values = c("firebrick", "forestgreen", "darkblue")) +
   geom_vline(xintercept = day_trigger, linetype = "dotted", color = "black") +
-  annotate("text", x = day_trigger + 2, y = max(sens8_df$total_infectious) * 0.9, 
+  annotate("text", x = day_trigger + 2, y = max(sens8_df$total_infectious) * 0.9,
            label = "Vaccination Trigger (Day 14)", angle = 90, hjust = 1) +
   labs(
     title = "Sensitivity Analysis 8: Reactive Ring vs. Mass-Size Vaccination",
@@ -867,38 +654,30 @@ ggplot(sens8_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   theme_minimal() +
   theme(plot.title = element_text(face = "bold", size = 11), legend.position = "bottom")
 
-
-# ==============================================================================
-# SENSITIVITY ANALYSIS 9: PHASED INTER-SCHOOL TRAVEL RESTRICTIONS
-# ==============================================================================
-# Steps down alpha dynamically as the outbreak progresses.
-
 run_phased_alpha <- function(alpha_schedule, label) {
   times_sim <- seq(0, 200, by = 1)
   curr_state <- initial_state
   p_temp <- params
   history_list <- list()
-  
+
   for (t_idx in 1:(length(times_sim) - 1)) {
     t_start <- times_sim[t_idx]
     t_end   <- times_sim[t_idx + 1]
-    
-    # Dynamically select alpha based on time step
+
     current_alpha <- alpha_schedule(t_start)
     p_temp$alpha  <- current_alpha
-    
-    step_out <- as.data.frame(ode(y = curr_state, times = c(t_start, t_end), 
+
+    step_out <- as.data.frame(ode(y = curr_state, times = c(t_start, t_end),
                                   func = seir_model, parms = p_temp))
-    
+
     curr_state <- unlist(step_out[2, 2:ncol(step_out)])
     history_list[[t_idx]] <- step_out[1, ]
   }
-  
+
   full_out <- bind_rows(history_list)
   get_total_I(full_out, label)
 }
 
-# Define alpha transition functions
 alpha_constant <- function(t) 0.05
 alpha_step_mod <- function(t) if (t >= 14) 0.025 else 0.05
 alpha_step_str <- function(t) if (t >= 14) 0.005 else 0.05
@@ -921,5 +700,3 @@ ggplot(sens9_df, aes(x = time, y = total_infectious, color = Scenario, linetype 
   ) +
   theme_minimal() +
   theme(plot.title = element_text(face = "bold", size = 11), legend.position = "bottom")
-
-

@@ -1,8 +1,6 @@
-
 library(tidyverse)
 library(deSolve)
 
-# Loading dataset and create page groups (6 schools per page = 15 pages total)
 df <- read.csv("data/processed/school_data_joined.csv") %>%
   mutate(
     vax_rate = if_else(percent_immunized > 1, percent_immunized / 100, percent_immunized),
@@ -10,10 +8,9 @@ df <- read.csv("data/processed/school_data_joined.csv") %>%
     page = ceiling(school_id / 6)
   )
 
-#  Model Parameters
-gamma_rate <- 1 / 7                   # Infectious period (~7 days)
-sigma_rate <- 1 / 10                  # Incubation period (~10 days)
-beta_rate  <- 15 * gamma_rate         # Transmissibility (R0 = 15)
+gamma_rate <- 1 / 7
+sigma_rate <- 1 / 10
+beta_rate  <- 15 * gamma_rate
 times <- seq(0, 200, by = 1)
 
 seir_model <- function(time, state, parameters) {
@@ -26,23 +23,22 @@ seir_model <- function(time, state, parameters) {
   })
 }
 
-# SEIR simulation across ALL 89 schools
 all_simulations <- map_dfr(1:nrow(df), function(i) {
   school <- df[i, ]
-  
+
   N <- school$total_students
   vax_rate <- school$vax_rate
-  
+
   R0_count <- round(N * vax_rate)
   I0_count <- 1
   E0_count <- 0
   S0_count <- max(0, N - I0_count - E0_count - R0_count)
-  
+
   initial_state <- c(S = S0_count, E = E0_count, I = I0_count, R = R0_count)
   params <- c(beta = beta_rate, sigma = sigma_rate, gamma = gamma_rate, N = N)
-  
+
   output <- ode(y = initial_state, times = times, func = seir_model, parms = params)
-  
+
   as.data.frame(output) %>%
     mutate(
       school_name = school$school_name,
@@ -51,16 +47,14 @@ all_simulations <- map_dfr(1:nrow(df), function(i) {
     )
 })
 
-# 4. Reshaping data into long format for plotting
 results_long <- all_simulations %>%
   pivot_longer(cols = c("S", "E", "I", "R"), names_to = "Compartment", values_to = "Count")
 
-# Plotting all pages into RStudio Plot History
 total_pages <- max(df$page)
 
 for (p in 1:total_pages) {
   page_data <- results_long %>% filter(page == p)
-  
+
   p_plot <- ggplot(page_data, aes(x = time, y = Count, color = Compartment)) +
     geom_line(linewidth = 1) +
     scale_color_manual(
@@ -84,11 +78,6 @@ for (p in 1:total_pages) {
       strip.text = element_text(size = 8, face = "bold"),
       legend.position = "bottom"
     )
-  
+
   print(p_plot)
 }
-
-
-
-
-

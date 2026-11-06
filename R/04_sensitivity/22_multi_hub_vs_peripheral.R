@@ -1,11 +1,3 @@
-# ============================================================
-# NETWORK SEIR MEASLES SIMULATION AND SENSITIVITY ANALYSIS
-# MULTI-HUB VS MULTI-PERIPHERAL SEEDING (3 HUBS & 3 PERIPHERALS)
-#
-# TOTAL NEW CASES:
-# C(T) = sum_i [S_i(0) - S_i(T)]
-# ============================================================
-
 suppressPackageStartupMessages({
   library(tidyverse)
   library(deSolve)
@@ -19,22 +11,15 @@ theme_set(
     )
 )
 
-
-# ============================================================
-# 1. LOAD SCHOOL DATA
-# ============================================================
-
 df <- read.csv("data/processed/school_data_joined.csv") %>%
   rename_with(tolower)
 
-# Ensure unit_id exists
 if (!"unit_id" %in% names(df)) {
   df <- df %>% mutate(unit_id = as.character(row_number()))
 } else {
   df <- df %>% mutate(unit_id = as.character(unit_id))
 }
 
-# Prepare school data
 df <- df %>%
   mutate(
     vax_rate = if_else(
@@ -48,11 +33,6 @@ df <- df %>%
 
 n_schools <- nrow(df)
 cat("\nNumber of schools:", n_schools, "\n")
-
-
-# ============================================================
-# 2. BUILD NETWORK ADJACENCY MATRIX
-# ============================================================
 
 net_df <- read.csv("data/processed/network_df.csv") %>%
   rename_with(tolower)
@@ -81,7 +61,7 @@ A <- matrix(0, nrow = n_schools, ncol = n_schools)
 for (k in seq_len(nrow(net_df))) {
   i <- unname(id_map[net_df$unit_id_a[k]])
   j <- unname(id_map[net_df$unit_id_b[k]])
-  
+
   if (length(i) == 1 && length(j) == 1 && !is.na(i) && !is.na(j)) {
     w <- if ("total_contacts" %in% names(net_df)) net_df$total_contacts[k] else 1
     if (is.na(w) || !is.finite(w) || w < 0) w <- 0
@@ -89,11 +69,6 @@ for (k in seq_len(nrow(net_df))) {
     A[j, i] <- w
   }
 }
-
-
-# ============================================================
-# 3. NORMALIZE NETWORK BY SPECTRAL RADIUS
-# ============================================================
 
 A_raw <- A
 spectral_radius <- max(Mod(eigen(A_raw, only.values = TRUE)$values))
@@ -103,11 +78,6 @@ if (!is.finite(spectral_radius) || spectral_radius <= 0) {
 }
 
 A <- A_raw / spectral_radius
-
-
-# ============================================================
-# 4. MODEL PARAMETERS & INITIAL SETUP
-# ============================================================
 
 gamma_rate <- 1 / 7
 sigma_rate <- 1 / 10
@@ -127,44 +97,33 @@ params <- list(
   n = n_schools
 )
 
-
-# ============================================================
-# 5. NETWORK SEIR MODEL DIFFERENTIAL EQUATIONS
-# ============================================================
-
 seir_model <- function(time, state, parameters) {
   with(as.list(parameters), {
     S <- state[1:n]
     E <- state[(n + 1):(2 * n)]
     I <- state[(2 * n + 1):(3 * n)]
     R <- state[(3 * n + 1):(4 * n)]
-    
+
     I_prop <- I / N
-    
+
     lambda <- (beta * I_prop) + (alpha * beta * as.vector(A %*% I_prop))
-    
+
     dS <- -lambda * S
     dE <- (lambda * S) - (sigma * E)
     dI <- (sigma * E) - (gamma * I)
     dR <- gamma * I
-    
+
     list(c(dS, dE, dI, dR))
   })
 }
 
-
-# ============================================================
-# 6. HELPER FUNCTIONS
-# ============================================================
-
-# Helper: Run dynamic simulation given a vax vector and single seed ID
 run_vax_scenario <- function(vax_vector, seed_id) {
   R0_vec <- round(N * vax_vector)
   I0_vec <- rep(0, n_schools)
   I0_vec[seed_id] <- 1
   E0_vec <- rep(0, n_schools)
   S0_vec <- pmax(0, N - I0_vec - E0_vec - R0_vec)
-  
+
   state_vec <- c(S0_vec, E0_vec, I0_vec, R0_vec)
   names(state_vec) <- c(
     paste0("S_", seq_len(n_schools)),
@@ -172,14 +131,13 @@ run_vax_scenario <- function(vax_vector, seed_id) {
     paste0("I_", seq_len(n_schools)),
     paste0("R_", seq_len(n_schools))
   )
-  
+
   out_df <- as.data.frame(
     ode(y = state_vec, times = times, func = seir_model, parms = params)
   )
   return(out_df)
 }
 
-# Helper: Extract total infectious cases over time
 get_total_I <- function(out_df, scenario_label, seed_type, seed_name) {
   out_df %>%
     pivot_longer(cols = -time, names_to = "var", values_to = "Count") %>%
@@ -193,21 +151,20 @@ get_total_I <- function(out_df, scenario_label, seed_type, seed_name) {
     )
 }
 
-# Helper: Calculate outbreak summary indicators
 calculate_outbreak_measures <- function(out_df) {
   S_columns <- grep("^S_", names(out_df), value = TRUE)
   I_columns <- grep("^I_", names(out_df), value = TRUE)
-  
+
   S_initial <- sapply(S_columns, function(x) out_df[[x]][1])
   S_final   <- sapply(S_columns, function(x) out_df[[x]][nrow(out_df)])
-  
+
   total_cases <- sum(S_initial - S_final, na.rm = TRUE)
   total_I     <- rowSums(out_df[, I_columns, drop = FALSE], na.rm = TRUE)
-  
+
   peak_burden <- max(total_I, na.rm = TRUE)
   peak_day    <- out_df$time[which.max(total_I)]
   attack_rate <- (total_cases / sum(N, na.rm = TRUE)) * 100
-  
+
   return(c(
     Total_Cases = total_cases,
     Peak_Burden = peak_burden,
@@ -216,11 +173,6 @@ calculate_outbreak_measures <- function(out_df) {
   ))
 }
 
-
-# ============================================================
-# 7. NETWORK CENTRALITY & SELECTION OF 3 HUBS AND 3 PERIPHERALS
-# ============================================================
-
 net_graph <- graph_from_adjacency_matrix(
   A, mode = "undirected", weighted = TRUE, diag = FALSE
 )
@@ -228,10 +180,8 @@ net_graph <- graph_from_adjacency_matrix(
 df$node_strength <- strength(net_graph, weights = E(net_graph)$weight)
 df$betweenness   <- betweenness(net_graph, weights = NA)
 
-# Rank schools by node strength
 sorted_df <- df %>% arrange(desc(node_strength))
 
-# Select top 3 hubs and bottom 3 peripheral schools
 hubs_df <- head(sorted_df, 3) %>% mutate(type = "Network Hub")
 periph_df <- tail(sorted_df, 3) %>% arrange(node_strength) %>% mutate(type = "Peripheral")
 
@@ -241,11 +191,6 @@ cat("\n========================================\n")
 cat("SELECTED SEEDING SCHOOLS (3 HUBS & 3 PERIPHERALS)\n")
 cat("========================================\n")
 print(target_schools %>% select(school_id, school_name, node_strength, type))
-
-
-# ============================================================
-# 8. RUN SENSITIVITY ANALYSIS SCENARIOS
-# ============================================================
 
 scenarios_list <- list(
   list(name = "Scenario 1: Observed Coverage", set_vax = NULL),
@@ -259,30 +204,25 @@ time_series_list    <- list()
 for (sc in scenarios_list) {
   sc_name <- sc$name
   fixed_vax <- sc$set_vax
-  
+
   for (idx in seq_len(nrow(target_schools))) {
     s_id   <- target_schools$school_id[idx]
     s_name <- target_schools$school_name[idx]
     s_type <- target_schools$type[idx]
-    
-    # Set vaccination profile for the run
+
     current_vax <- df$vax_rate
     if (!is.null(fixed_vax)) {
-      # Apply target coverage rate across all 6 seed locations
+
       current_vax[target_schools$school_id] <- fixed_vax
     }
-    
-    # Run ODE
+
     out_df <- run_vax_scenario(current_vax, s_id)
-    
-    # Store time series for plotting
+
     ts_data <- get_total_I(out_df, sc_name, s_type, s_name)
     time_series_list[[length(time_series_list) + 1]] <- ts_data
-    
-    # Calculate metrics
+
     metrics <- calculate_outbreak_measures(out_df)
-    
-    # Record row for results table
+
     results_table_list[[length(results_table_list) + 1]] <- tibble(
       Scenario = sc_name,
       `Seed Location` = s_name,
@@ -296,16 +236,9 @@ for (sc in scenarios_list) {
   }
 }
 
-# Bind into single datasets
 comparison_all <- bind_rows(time_series_list)
 table_4_3      <- bind_rows(results_table_list)
 
-
-# ============================================================
-# 9. PLOT MULTI-HUB VS MULTI-PERIPHERAL SEEDING
-# ============================================================
-
-# Aggregate mean/ribbon curves per group across the 3 hubs and 3 peripherals
 summary_ts <- comparison_all %>%
   group_by(Scenario, `Seed Type`, time) %>%
   summarise(
@@ -338,11 +271,6 @@ p_comparison <- ggplot(
   )
 
 print(p_comparison)
-
-
-# ============================================================
-# 10. DISPLAY AND SAVE TABLE 4.3 RESULTS
-# ============================================================
 
 cat("\n\n============================================================\n")
 cat("TABLE 4.3: SENSITIVITY ANALYSIS OF 3 HUBS VS 3 PERIPHERALS\n")

@@ -1,7 +1,3 @@
-# ==============================================================================
-# SENSITIVITY ANALYSIS: VACCINE ALLOCATION BY SCHOOL SIZE VS UNIFORM
-# ==============================================================================
-
 library(deSolve)
 library(dplyr)
 library(readr)
@@ -9,9 +5,6 @@ library(tibble)
 library(ggplot2)
 library(tidyr)
 
-# ------------------------------------------------------------------------------
-# 1. LOAD & CLEAN DATA
-# ------------------------------------------------------------------------------
 school_file  <- "data/processed/school_data_joined.csv"
 network_file <- "data/processed/network_df.csv"
 
@@ -32,7 +25,6 @@ standardize_names <- function(data) {
 school_data  <- standardize_names(school_data)
 network_data <- standardize_names(network_data)
 
-# Helper for standardizing column names
 rename_if_found <- function(df, target, candidates) {
   match <- intersect(candidates, names(df))
   if (length(match) > 0 && !target %in% names(df)) {
@@ -64,13 +56,9 @@ n_school <- nrow(school_data)
 school_ids <- school_data$unit_id
 school_names <- school_data$school_name
 
-# Size definitions
 small_schools <- N <= 700
 large_schools <- N > 700
 
-# ------------------------------------------------------------------------------
-# 2. NETWORK ADJACENCY MATRIX
-# ------------------------------------------------------------------------------
 network_data <- network_data %>%
   mutate(unit_id_a = trimws(as.character(unit_id_a)),
          unit_id_b = trimws(as.character(unit_id_b)),
@@ -95,9 +83,6 @@ for (k in seq_len(nrow(network_edges))) {
 spectral_radius <- max(Mod(eigen(A_raw, only.values = TRUE)$values))
 A <- A_raw / spectral_radius
 
-# ------------------------------------------------------------------------------
-# 3. SEIR MODEL & SIMULATION SETUP
-# ------------------------------------------------------------------------------
 gamma_rate <- 1 / 7
 sigma_rate <- 1 / 10
 beta_rate  <- 15 * gamma_rate
@@ -111,15 +96,15 @@ network_seir <- function(t, state, parms) {
     E <- state[n_school + seq_len(n_school)]
     I <- state[2 * n_school + seq_len(n_school)]
     R <- state[3 * n_school + seq_len(n_school)]
-    
+
     infectious_fraction <- I / N
     lambda <- beta_rate * infectious_fraction + alpha * beta_rate * as.vector(A %*% infectious_fraction)
-    
+
     dS <- -lambda * S
     dE <- lambda * S - sigma_rate * E
     dI <- sigma_rate * E - gamma_rate * I
     dR <- gamma_rate * I
-    
+
     return(list(c(dS, dE, dI, dR)))
   })
 }
@@ -130,34 +115,28 @@ run_simulation <- function(vax_vector) {
   I_init <- rep(0, n_school)
   I_init[seed_school_index] <- 1
   S_init <- pmax(0, N - R_init - E_init - I_init)
-  
+
   initial_state <- c(S_init, E_init, I_init, R_init)
-  parms <- list(N = N, A = A, beta_rate = beta_rate, sigma_rate = sigma_rate, 
+  parms <- list(N = N, A = A, beta_rate = beta_rate, sigma_rate = sigma_rate,
                 gamma_rate = gamma_rate, alpha = alpha, n_school = n_school)
-  
-  out <- as.data.frame(ode(y = initial_state, times = simulation_times, 
+
+  out <- as.data.frame(ode(y = initial_state, times = simulation_times,
                            func = network_seir, parms = parms, method = "lsoda"))
-  
-  # Extract total infectious across all schools per time point
-  I_cols <- paste0("1", seq_len(n_school)) # pattern matching for I
+
+  I_cols <- paste0("1", seq_len(n_school))
   I_matrix <- as.matrix(out[, (2 * n_school + 2):(3 * n_school + 1)])
-  
+
   tibble(
     Day = out$time,
     Infectious_Students = rowSums(I_matrix)
   )
 }
 
-# ------------------------------------------------------------------------------
-# 4. DEFINE SCENARIOS FOR SENSITIVITY PLOTTING
-# ------------------------------------------------------------------------------
-
-# Solve required counterpart coverage matching population aggregate:
 calc_counterpart <- function(target_agg, fixed_cov, fixed_is_small) {
   pop_small <- sum(N[small_schools])
   pop_large <- sum(N[large_schools])
   pop_total <- sum(N)
-  
+
   if (fixed_is_small) {
     return((target_agg * pop_total - fixed_cov * pop_small) / pop_large)
   } else {
@@ -171,8 +150,7 @@ scenarios_list <- list()
 
 for (cut in cutoffs) {
   cut_pct <- paste0(round(cut * 100), "%")
-  
-  # 1. Uniform Scenario
+
   vax_unif <- rep(cut, n_school)
   sim_unif <- run_simulation(vax_unif)
   sim_unif <- sim_unif %>% mutate(
@@ -181,8 +159,7 @@ for (cut in cutoffs) {
     Scenario_Label = paste("Uniform", cut_pct)
   )
   scenarios_list[[length(scenarios_list) + 1]] <- sim_unif
-  
-  # 2. Small Emphasis (Small high, Large adjusted)
+
   high_small <- min(1.0, cut + 0.05)
   adj_large  <- calc_counterpart(cut, high_small, fixed_is_small = TRUE)
   vax_small  <- ifelse(small_schools, high_small, adj_large)
@@ -193,8 +170,7 @@ for (cut in cutoffs) {
     Scenario_Label = paste("Small Emphasis", cut_pct)
   )
   scenarios_list[[length(scenarios_list) + 1]] <- sim_small
-  
-  # 3. Large Emphasis (Large high, Small adjusted)
+
   high_large <- min(1.0, cut + 0.05)
   adj_small  <- calc_counterpart(cut, high_large, fixed_is_small = FALSE)
   vax_large  <- ifelse(large_schools, high_large, adj_small)
@@ -209,10 +185,6 @@ for (cut in cutoffs) {
 
 plot_data <- bind_rows(scenarios_list)
 
-# ------------------------------------------------------------------------------
-# 5. GENERATE & DISPLAY PLOT
-# ------------------------------------------------------------------------------
-
 epidemic_plot <- ggplot(
   plot_data,
   aes(
@@ -223,12 +195,12 @@ epidemic_plot <- ggplot(
   )
 ) +
   geom_line(linewidth = 1.0) +
-  facet_wrap(~ Cutoff, nrow = 1) +  # Displays left to right in order (70%, 80%, 90%)
+  facet_wrap(~ Cutoff, nrow = 1) +
   scale_color_manual(
     values = c(
-      "Uniform"                = "#2b5c8f", # Consistent Blue
-      "Small School Emphasis" = "#e06d53", # Consistent Red/Coral
-      "Large School Emphasis" = "#2ca02c"  # Consistent Green
+      "Uniform"                = "#2b5c8f",
+      "Small School Emphasis" = "#e06d53",
+      "Large School Emphasis" = "#2ca02c"
     ),
     name = "Allocation Type"
   ) +

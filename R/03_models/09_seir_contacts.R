@@ -1,7 +1,6 @@
 library(tidyverse)
 library(deSolve)
 
-
 df <- read.csv("data/processed/school_data_joined.csv")
 names(df) <- tolower(names(df))
 
@@ -40,7 +39,6 @@ net_df <- net_df %>%
     unit_id_a = as.character(unit_id_a),
     unit_id_b = as.character(unit_id_b)
   )
-#  Building Adjacency Matrix (A)
 
 id_map <- setNames(1:n_schools, df$unit_id)
 A      <- matrix(0, nrow = n_schools, ncol = n_schools)
@@ -59,18 +57,17 @@ spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))
 if (!is.finite(spectral_radius) || spectral_radius <= 0) {
   stop("The network spectral radius is zero or invalid.")
 }
-A <- A / spectral_radius  
+A <- A / spectral_radius
 
-# Model Parameters & Initial Conditions
-gamma_rate <- 1 / 7                    # Infectious period (~7 days)
-sigma_rate <- 1 / 10                   # Incubation period (~10 days)
-beta_rate  <- 15 * gamma_rate          # Intra-school transmission (R0 = 15)
-alpha      <- 0.05                     # Alpha: Inter-school coupling coefficient (5%)
+gamma_rate <- 1 / 7
+sigma_rate <- 1 / 10
+beta_rate  <- 15 * gamma_rate
+alpha      <- 0.05
 times      <- seq(0, 200, by = 1)
 
 N <- df$total_students
 R0_count <- round(N * df$vax_rate)
-I0_count <- c(1, rep(0, n_schools - 1)) # Outbreak starts with 1 case in School 1
+I0_count <- c(1, rep(0, n_schools - 1))
 E0_count <- rep(0, n_schools)
 S0_count <- pmax(0, N - I0_count - E0_count - R0_count)
 
@@ -92,22 +89,21 @@ params <- list(
   n     = n_schools
 )
 
-
 seir_model <- function(time, state, parameters) {
   with(as.list(parameters), {
     S <- state[1:n]
     E <- state[(n + 1):(2 * n)]
     I <- state[(2 * n + 1):(3 * n)]
     R <- state[(3 * n + 1):(4 * n)]
-    
+
     I_prop <- I / N
     lambda <- (beta * I_prop) + (alpha * beta * as.vector(A %*% I_prop))
-    
+
     dS <- - lambda * S
     dE <-   lambda * S - (sigma * E)
     dI <-  (sigma * E) - (gamma * I)
     dR <-  (gamma * I)
-    
+
     return(list(c(dS, dE, dI, dR)))
   })
 }
@@ -127,10 +123,10 @@ total_pages <- max(df$page)
 
 for (p in 1:total_pages) {
   page_data <- results_long %>% filter(page == p)
-  
+
   p_plot <- ggplot(page_data, aes(x = time, y = Count, color = Compartment)) +
     geom_line(linewidth = 1) +
-    #scale_y_log10() +
+
     scale_color_manual(
       values = c("S" = "blue", "E" = "orange", "I" = "red", "R" = "green"),
       labels = c(
@@ -152,7 +148,6 @@ for (p in 1:total_pages) {
       strip.text = element_text(size = 8, face = "bold"),
       legend.position = "bottom"
     )
-  
+
   print(p_plot)
 }
-

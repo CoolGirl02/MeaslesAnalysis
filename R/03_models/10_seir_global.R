@@ -1,27 +1,16 @@
-# ============================================================
-# 1. LOAD LIBRARIES
-# ============================================================
-
 library(tidyverse)
 library(deSolve)
-
-
-# ============================================================
-# 2. LOAD SCHOOL DATA
-# ============================================================
 
 df <- read.csv("data/processed/school_data_joined.csv")
 
 names(df) <- tolower(names(df))
 
-# Ensure that every school has an ID
 if (!"unit_id" %in% names(df)) {
   df$unit_id <- as.character(seq_len(nrow(df)))
 } else {
   df$unit_id <- as.character(df$unit_id)
 }
 
-# Check that the required columns exist
 required_columns <- c(
   "unit_id",
   "school_name",
@@ -40,7 +29,6 @@ if (length(missing_columns) > 0) {
   )
 }
 
-# Prepare school data
 df <- df %>%
   mutate(
     vax_rate = if_else(
@@ -54,23 +42,16 @@ df <- df %>%
 
 n_schools <- nrow(df)
 
-
-# ============================================================
-# 3. FIND GLOBAL ACADEMY OF SC IN THE DATASET
-# ============================================================
-
 seed_school_name <- "Global Academy of SC"
 
-# Standardise names to make matching case-insensitive
 school_names_clean <- trimws(tolower(as.character(df$school_name)))
 
 seed_index <- which(
   school_names_clean == trimws(tolower(seed_school_name))
 )
 
-# If the exact name is not found, display possible matches
 if (length(seed_index) == 0) {
-  
+
   possible_matches <- df$school_name[
     grepl(
       "global academy",
@@ -78,7 +59,7 @@ if (length(seed_index) == 0) {
       ignore.case = TRUE
     )
   ]
-  
+
   if (length(possible_matches) > 0) {
     cat("Possible matching school names:\n")
     print(possible_matches)
@@ -87,11 +68,10 @@ if (length(seed_index) == 0) {
     cat("Available school names include:\n")
     print(head(df$school_name, 20))
   }
-  
+
   stop("Seed school not found. Check the school name in the dataset.")
 }
 
-# Ensure that exactly one school matches
 if (length(seed_index) > 1) {
   stop("More than one school matches Global Academy of SC.")
 }
@@ -101,11 +81,6 @@ cat(
   as.character(df$school_name[seed_index]),
   "\n"
 )
-
-
-# ============================================================
-# 4. LOAD NETWORK DATA
-# ============================================================
 
 net_df <- read.csv("data/processed/network_df.csv")
 
@@ -137,11 +112,6 @@ net_df <- net_df %>%
     unit_id_b = as.character(unit_id_b)
   )
 
-
-# ============================================================
-# 5. BUILD THE ADJACENCY MATRIX
-# ============================================================
-
 id_map <- setNames(seq_len(n_schools), df$unit_id)
 
 A <- matrix(
@@ -151,10 +121,10 @@ A <- matrix(
 )
 
 for (k in seq_len(nrow(net_df))) {
-  
+
   i <- unname(id_map[net_df$unit_id_a[k]])
   j <- unname(id_map[net_df$unit_id_b[k]])
-  
+
   if (
     length(i) == 1 &&
     length(j) == 1 &&
@@ -162,20 +132,18 @@ for (k in seq_len(nrow(net_df))) {
     !is.na(j) &&
     i != j
   ) {
-    
+
     w <- net_df$total_contacts[k]
-    
+
     if (is.na(w) || !is.finite(w) || w < 0) {
       next
     }
-    
-    # Set the connection weight between the two schools
+
     A[i, j] <- w
     A[j, i] <- w
   }
 }
 
-# Normalise the adjacency matrix by its spectral radius
 spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))
 
 if (!is.finite(spectral_radius) || spectral_radius <= 0) {
@@ -184,11 +152,6 @@ if (!is.finite(spectral_radius) || spectral_radius <= 0) {
 
 A <- A / spectral_radius
 
-
-# ============================================================
-# 6. SET MODEL PARAMETERS
-# ============================================================
-
 gamma_rate <- 1 / 7
 sigma_rate <- 1 / 10
 beta_rate <- 15 * gamma_rate
@@ -196,27 +159,16 @@ alpha <- 0.05
 
 times <- seq(0, 200, by = 1)
 
-# Total population of each school
 N <- df$total_students
 
-# Initially vaccinated students
 R0_count <- round(N * df$vax_rate)
-
-
-# ============================================================
-# 7. INITIAL CONDITIONS
-#    ONE INFECTIOUS STUDENT AT GLOBAL ACADEMY OF SC
-# ============================================================
 
 I0_count <- rep(0, n_schools)
 
-# Only Global Academy of SC starts with one infectious student
 I0_count[seed_index] <- 1
 
-# No initially exposed students
 E0_count <- rep(0, n_schools)
 
-# Initially susceptible students
 S0_count <- pmax(
   0,
   N - I0_count - E0_count - R0_count
@@ -229,11 +181,6 @@ cat(
   as.character(df$school_name[seed_index]),
   "\n"
 )
-
-
-# ============================================================
-# 8. CREATE INITIAL STATE
-# ============================================================
 
 initial_state <- c(
   S0_count,
@@ -249,11 +196,6 @@ names(initial_state) <- c(
   paste0("R_", seq_len(n_schools))
 )
 
-
-# ============================================================
-# 9. MODEL PARAMETERS LIST
-# ============================================================
-
 params <- list(
   beta = beta_rate,
   sigma = sigma_rate,
@@ -264,48 +206,34 @@ params <- list(
   n = n_schools
 )
 
-
-# ============================================================
-# 10. NETWORK-BASED SEIR MODEL
-# ============================================================
-
 seir_model <- function(time, state, parameters) {
-  
+
   with(as.list(parameters), {
-    
+
     S <- state[seq_len(n)]
-    
+
     E <- state[n + seq_len(n)]
-    
+
     I <- state[2 * n + seq_len(n)]
-    
+
     R <- state[3 * n + seq_len(n)]
-    
-    # Proportion of infectious students in each school
+
     I_prop <- I / N
-    
-    # Force of infection:
-    # within-school transmission plus between-school transmission
+
     lambda <- (beta * I_prop) +
       (alpha * beta * as.vector(A %*% I_prop))
-    
-    # SEIR differential equations
+
     dS <- -lambda * S
-    
+
     dE <- lambda * S - sigma * E
-    
+
     dI <- sigma * E - gamma * I
-    
+
     dR <- gamma * I
-    
+
     return(list(c(dS, dE, dI, dR)))
   })
 }
-
-
-# ============================================================
-# 11. RUN THE SEIR SIMULATION
-# ============================================================
 
 output <- ode(
   y = initial_state,
@@ -315,11 +243,6 @@ output <- ode(
 )
 
 cat("SEIR simulation completed successfully.\n")
-
-
-# ============================================================
-# 12. PREPARE RESULTS FOR PLOTTING
-# ============================================================
 
 results_long <- as.data.frame(output) %>%
   pivot_longer(
@@ -343,19 +266,13 @@ results_long <- as.data.frame(output) %>%
     )
   )
 
-
-
-# ============================================================
-# 13. PLOT SEIR DYNAMICS FOR ALL SCHOOLS
-# ============================================================
-
 total_pages <- max(df$page)
 
 for (p in seq_len(total_pages)) {
-  
+
   page_data <- results_long %>%
     filter(page == p)
-  
+
   p_plot <- ggplot(
     page_data,
     aes(
@@ -365,11 +282,9 @@ for (p in seq_len(total_pages)) {
       linetype = Compartment
     )
   ) +
-    
-    # Draw the SEIR curves
+
     geom_line(linewidth = 0.8) +
-    
-    # Set colours for the four compartments
+
     scale_color_manual(
       values = c(
         "S" = "blue",
@@ -385,8 +300,7 @@ for (p in seq_len(total_pages)) {
         "R" = "Recovered/Vaccinated (R)"
       )
     ) +
-    
-    # Set line types for the four compartments
+
     scale_linetype_manual(
       values = c(
         "S" = "solid",
@@ -402,23 +316,20 @@ for (p in seq_len(total_pages)) {
         "R" = "Recovered/Vaccinated (R)"
       )
     ) +
-    
-    # Display six schools on each page
+
     facet_wrap(
       ~school_label,
       ncol = 3,
       scales = "free_y"
     ) +
-    
-    # Pseudo-logarithmic y-axis with fewer labels
+
     scale_y_continuous(
       trans = scales::pseudo_log_trans(sigma = 1),
       breaks = scales::breaks_pretty(n = 4),
       labels = scales::label_comma(),
       expand = expansion(mult = c(0, 0.05))
     ) +
-    
-    # Titles and axis labels
+
     labs(
       title = paste0(
         "SEIR Measles Simulations - Seed: ",
@@ -429,9 +340,9 @@ for (p in seq_len(total_pages)) {
       color = "Compartment",
       linetype = "Compartment"
     ) +
-    
+
     theme_minimal() +
-    
+
     theme(
       strip.text = element_text(
         size = 8,
@@ -439,7 +350,7 @@ for (p in seq_len(total_pages)) {
       ),
       legend.position = "bottom"
     )
-  
+
   print(p_plot)
 }
 
