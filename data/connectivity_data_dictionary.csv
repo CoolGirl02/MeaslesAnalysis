@@ -1,0 +1,7 @@
+variable,definition
+poi_county,county with places of interest (poi)
+unit_id_A,uint id associated with school A
+school_name_A,name of school A
+unit_id_B,unit id associated with school B
+school_name_B,name of school B
+connect_risk,measure of connectivity risk between school A and school B

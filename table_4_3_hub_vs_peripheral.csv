@@ -1,0 +1,7 @@
+"Scenario","Seed Location","Seed Type","Vaccination Coverage","Total New Cases (C)","Peak Burden (Ipeak)","Peak Day","Attack Rate (AR)"
+"Scenario 1: Empirical Coverage","Libertas Academy - Boiling Springs","Network Hub","74.3%",4250,283,101,"7.62%"
+"Scenario 1: Empirical Coverage","The Cleveland Academy of Leadership","Peripheral","91.6%",4008,313,135,"7.19%"
+"Scenario 2: Both Seed Schools at 74%","Libertas Academy - Boiling Springs","Network Hub","74.0%",4379,303,103,"7.85%"
+"Scenario 2: Both Seed Schools at 74%","The Cleveland Academy of Leadership","Peripheral","74.0%",4179,308,130,"7.5%"
+"Scenario 3: Both Seed Schools at 91.6%","Libertas Academy - Boiling Springs","Network Hub","91.6%",3932,269,122,"7.05%"
+"Scenario 3: Both Seed Schools at 91.6%","The Cleveland Academy of Leadership","Peripheral","91.6%",3767,295,140,"6.76%"

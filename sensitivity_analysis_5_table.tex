@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\centering
+\caption{Epidemic Outcomes under Size-Based Allocation and Uniform Baseline Strategies}
+\label{tab:sensitivity_size_allocation}
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|c|c|c|c|c|c|c|}
+\hline
+\textbf{Scenario} & \textbf{\begin{tabular}[c]{@{}c@{}}Small\\ Cov.\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Large\\ Cov.\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Agg.\\ Cov.\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Peak Burden\\ ($I^{\text{peak}}$)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Peak Day\\ ($t^{\text{peak}}$)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Total New\\ Cases ($C$)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Attack Rate\\ ($AR$)\end{tabular}} \\ \hline
+Baseline: Uniform 70% & 70.00\% & 70.00\% & 70.00\% & 2,402 & 89 & 16,539 & 29.66\% \\ \hline
+Baseline: Uniform 80% & 80.00\% & 80.00\% & 80.00\% & 1,074 & 125 & 10,425 & 18.70\% \\ \hline
+Allocated: High Small / Low Large & 75.00\% & 90.00\% & 82.89\% & 881 & 115 & 7,467 & 13.39\% \\ \hline
+Allocated: Low Small / High Large & 91.64\% & 75.00\% & 82.89\% & 877 & 103 & 7,560 & 13.56\% \\ \hline
+Baseline: Uniform 90% & 90.00\% & 90.00\% & 90.00\% & 58 & 200 & 433 & 0.78\% \\ \hline
+\end{tabularx}
+\end{table}

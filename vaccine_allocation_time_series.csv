@@ -1,0 +1,1006 @@
+Scenario,Allocation,time,total_infectious
+Baseline,Uniform 70%,0,1
+Baseline,Uniform 70%,1,0.8993550959305094
+Baseline,Uniform 70%,2,0.8677460772720879
+Baseline,Uniform 70%,3,0.88844630722584494
+Baseline,Uniform 70%,4,0.9510596077758834
+Baseline,Uniform 70%,5,1.0495902970109365
+Baseline,Uniform 70%,6,1.18116070327362
+Baseline,Uniform 70%,7,1.3451665682123284
+Baseline,Uniform 70%,8,1.5427297112637433
+Baseline,Uniform 70%,9,1.7763534696261079
+Baseline,Uniform 70%,10,2.049717251907206
+Baseline,Uniform 70%,11,2.367567262802914
+Baseline,Uniform 70%,12,2.7356743598413793
+Baseline,Uniform 70%,13,3.1608391565928744
+Baseline,Uniform 70%,14,3.6509305914420045
+Baseline,Uniform 70%,15,4.214948098220843
+Baseline,Uniform 70%,16,4.863099946485894
+Baseline,Uniform 70%,17,5.606891778108215
+Baseline,Uniform 70%,18,6.4592200297571445
+Baseline,Uniform 70%,19,7.434465319597056
+Baseline,Uniform 70%,20,8.54858083963087
+Baseline,Uniform 70%,21,9.819170922695754
+Baseline,Uniform 70%,22,11.265554929789404
+Baseline,Uniform 70%,23,12.908812390043517
+Baseline,Uniform 70%,24,14.771806339915463
+Baseline,Uniform 70%,25,16.879183919261575
+Baseline,Uniform 70%,26,19.257356448428418
+Baseline,Uniform 70%,27,21.93446568692533
+Baseline,Uniform 70%,28,24.94034858446545
+Baseline,Uniform 70%,29,28.30651973449613
+Baseline,Uniform 70%,30,32.06619797817466
+Baseline,Uniform 70%,31,36.254409990163715
+Baseline,Uniform 70%,32,40.90820903115446
+Baseline,Uniform 70%,33,46.06704815304589
+Baseline,Uniform 70%,34,51.77334282662238
+Baseline,Uniform 70%,35,58.073247771084915
+Baseline,Uniform 70%,36,65.01765455497812
+Baseline,Uniform 70%,37,72.66339142171492
+Baseline,Uniform 70%,38,81.07457621655074
+Baseline,Uniform 70%,39,90.32404364520394
+Baseline,Uniform 70%,40,100.49473574931484
+Baseline,Uniform 70%,41,111.68092318645834
+Baseline,Uniform 70%,42,123.98911200941693
+Baseline,Uniform 70%,43,137.53849014096505
+Baseline,Uniform 70%,44,152.46078195245042
+Baseline,Uniform 70%,45,168.8994029438162
+Baseline,Uniform 70%,46,187.00784733798812
+Baseline,Uniform 70%,47,206.9472827179342
+Baseline,Uniform 70%,48,228.88338117466114
+Baseline,Uniform 70%,49,252.9824709195689
+Baseline,Uniform 70%,50,279.40715210745094
+Baseline,Uniform 70%,51,308.3115738057518
+Baseline,Uniform 70%,52,339.8366216955728
+Baseline,Uniform 70%,53,374.1052955547172
+Baseline,Uniform 70%,54,411.21856984635303
+Baseline,Uniform 70%,55,451.25201505323287
+Baseline,Uniform 70%,56,494.25340164446635
+Baseline,Uniform 70%,57,540.2414317977823
+Baseline,Uniform 70%,58,589.2056307657274
+Baseline,Uniform 70%,59,641.1073098833411
+Baseline,Uniform 70%,60,695.8813927714906
+Baseline,Uniform 70%,61,753.4387980782795
+Baseline,Uniform 70%,62,813.6690061209908
+Baseline,Uniform 70%,63,876.442409353687
+Baseline,Uniform 70%,64,941.6120728176222
+Baseline,Uniform 70%,65,1009.0145860101165
+Baseline,Uniform 70%,66,1078.4697825303333
+Baseline,Uniform 70%,67,1149.7792203654926
+Baseline,Uniform 70%,68,1222.723447050416
+Baseline,Uniform 70%,69,1297.058209879208
+Baseline,Uniform 70%,70,1372.5099048726177
+Baseline,Uniform 70%,71,1448.7706760765536
+Baseline,Uniform 70%,72,1525.4936735916226
+Baseline,Uniform 70%,73,1602.289039849129
+Baseline,Uniform 70%,74,1678.7212064456132
+Baseline,Uniform 70%,75,1754.3080496827022
+Baseline,Uniform 70%,76,1828.5223576316253
+Baseline,Uniform 70%,77,1900.7959161296048
+Baseline,Uniform 70%,78,1970.5263379326639
+Baseline,Uniform 70%,79,2037.0865499944116
+Baseline,Uniform 70%,80,2099.8366506708894
+Baseline,Uniform 70%,81,2158.137665998911
+Baseline,Uniform 70%,82,2211.3665974805017
+Baseline,Uniform 70%,83,2258.932070672838
+Baseline,Uniform 70%,84,2300.2898615125314
+Baseline,Uniform 70%,85,2334.9575990473036
+Baseline,Uniform 70%,86,2362.5279950349095
+Baseline,Uniform 70%,87,2382.680029454074
+Baseline,Uniform 70%,88,2395.187620932512
+Baseline,Uniform 70%,89,2399.925420816005
+Baseline,Uniform 70%,90,2396.8715005574118
+Baseline,Uniform 70%,91,2386.106849430219
+Baseline,Uniform 70%,92,2367.8117589133535
+Baseline,Uniform 70%,93,2342.2593373733807
+Baseline,Uniform 70%,94,2309.8065511923337
+Baseline,Uniform 70%,95,2270.883316023312
+Baseline,Uniform 70%,96,2225.980242858474
+Baseline,Uniform 70%,97,2175.6356680379636
+Baseline,Uniform 70%,98,2120.422570553605
+Baseline,Uniform 70%,99,2060.935900287849
+Baseline,Uniform 70%,100,1997.7807319382375
+Baseline,Uniform 70%,101,1931.5615370164994
+Baseline,Uniform 70%,102,1862.872743936349
+Baseline,Uniform 70%,103,1792.2906547343914
+Baseline,Uniform 70%,104,1720.3667082951492
+Baseline,Uniform 70%,105,1647.62202875444
+Baseline,Uniform 70%,106,1574.5431702061148
+Baseline,Uniform 70%,107,1501.5789578866343
+Baseline,Uniform 70%,108,1429.138326452893
+Baseline,Uniform 70%,109,1357.5890595337676
+Baseline,Uniform 70%,110,1287.2573390150728
+Baseline,Uniform 70%,111,1218.4280150247187
+Baseline,Uniform 70%,112,1151.3455073749308
+Baseline,Uniform 70%,113,1086.2152475311984
+Baseline,Uniform 70%,114,1023.205569718733
+Baseline,Uniform 70%,115,962.4499585108565
+Baseline,Uniform 70%,116,904.0495632609911
+Baseline,Uniform 70%,117,848.0758932036235
+Baseline,Uniform 70%,118,794.5736133934073
+Baseline,Uniform 70%,119,743.5633724774433
+Baseline,Uniform 70%,120,695.0445996040803
+Baseline,Uniform 70%,121,648.9982204660805
+Baseline,Uniform 70%,122,605.389252573515
+Baseline,Uniform 70%,123,564.1692491562826
+Baseline,Uniform 70%,124,525.2785709547832
+Baseline,Uniform 70%,125,488.6484720932102
+Baseline,Uniform 70%,126,454.20299417283735
+Baseline,Uniform 70%,127,421.8606675821496
+Baseline,Uniform 70%,128,391.5360239653708
+Baseline,Uniform 70%,129,363.14092680637236
+Baseline,Uniform 70%,130,336.58572991804965
+Baseline,Uniform 70%,131,311.78027516207135
+Baseline,Uniform 70%,132,288.63474181390137
+Baseline,Uniform 70%,133,267.0603604798977
+Baseline,Uniform 70%,134,246.97000457590124
+Baseline,Uniform 70%,135,228.27867208829997
+Baseline,Uniform 70%,136,210.9038698893034
+Baseline,Uniform 70%,137,194.76591220511924
+Baseline,Uniform 70%,138,179.78814407355313
+Baseline,Uniform 70%,139,165.89709980029232
+Baseline,Uniform 70%,140,153.0226055622259
+Baseline,Uniform 70%,141,141.09783444658078
+Baseline,Uniform 70%,142,130.05932138247596
+Baseline,Uniform 70%,143,119.84694461835686
+Baseline,Uniform 70%,144,110.40387962524547
+Baseline,Uniform 70%,145,101.67653062071948
+Baseline,Uniform 70%,146,93.61444425451695
+Baseline,Uniform 70%,147,86.17020939065013
+Baseline,Uniform 70%,148,79.29934638714327
+Baseline,Uniform 70%,149,72.96018879125064
+Baseline,Uniform 70%,150,67.11375992974288
+Baseline,Uniform 70%,151,61.72364649016613
+Baseline,Uniform 70%,152,56.75587084713998
+Baseline,Uniform 70%,153,52.178763586993554
+Baseline,Uniform 70%,154,47.96283742267989
+Baseline,Uniform 70%,155,44.08066346193388
+Baseline,Uniform 70%,156,40.50675059447995
+Baseline,Uniform 70%,157,37.217428594163714
+Baseline,Uniform 70%,158,34.19073538629216
+Baseline,Uniform 70%,159,31.406308806951635
+Baseline,Uniform 70%,160,28.84528307645095
+Baseline,Uniform 70%,161,26.4901901213899
+Baseline,Uniform 70%,162,24.324865806902654
+Baseline,Uniform 70%,163,22.334361080444193
+Baseline,Uniform 70%,164,20.50485797946318
+Baseline,Uniform 70%,165,18.823590415820362
+Baseline,Uniform 70%,166,17.278769618569854
+Baseline,Uniform 70%,167,15.85951409250955
+Baseline,Uniform 70%,168,14.55578393166581
+Baseline,Uniform 70%,169,13.358319313697393
+Baseline,Uniform 70%,170,12.258582992265055
+Baseline,Uniform 70%,171,11.24870659901871
+Baseline,Uniform 70%,172,10.321440564393193
+Baseline,Uniform 70%,173,9.470107466346438
+Baseline,Uniform 70%,174,8.688558618080238
+Baseline,Uniform 70%,175,7.971133708946135
+Baseline,Uniform 70%,176,7.3126233180138795
+Baseline,Uniform 70%,177,6.708234126679281
+Baseline,Uniform 70%,178,6.153556658470366
+Baseline,Uniform 70%,179,5.644535384173723
+Baseline,Uniform 70%,180,5.177441040416601
+Baseline,Uniform 70%,181,4.748845012633514
+Baseline,Uniform 70%,182,4.355595642261723
+Baseline,Uniform 70%,183,3.994796325865814
+Baseline,Uniform 70%,184,3.663785281262136
+Baseline,Uniform 70%,185,3.3601168626581632
+Baseline,Uniform 70%,186,3.0815443140811345
+Baseline,Uniform 70%,187,2.8260038571064676
+Baseline,Uniform 70%,188,2.5916000158427903
+Baseline,Uniform 70%,189,2.376592087048343
+Baseline,Uniform 70%,190,2.179381669609201
+Baseline,Uniform 70%,191,1.9985011785976103
+Baseline,Uniform 70%,192,1.832603264356074
+Baseline,Uniform 70%,193,1.6804510708239524
+Baseline,Uniform 70%,194,1.5409092669706692
+Baseline,Uniform 70%,195,1.4129357940731955
+Baseline,Uniform 70%,196,1.295574272579298
+Baseline,Uniform 70%,197,1.1879470174321742
+Baseline,Uniform 70%,198,1.0892486144856621
+Baseline,Uniform 70%,199,0.9987400140619646
+Baseline,Uniform 70%,200,0.9157431010585612
+Baseline,Uniform 80%,0,1
+Baseline,Uniform 80%,1,0.8884472477209399
+Baseline,Uniform 80%,2,0.8282292555855868
+Baseline,Uniform 80%,3,0.8063305780337797
+Baseline,Uniform 80%,4,0.8137162985391849
+Baseline,Uniform 80%,5,0.8441891702988962
+Baseline,Uniform 80%,6,0.8935822199296923
+Baseline,Uniform 80%,7,0.9591883218240954
+Baseline,Uniform 80%,8,1.0393576586964304
+Baseline,Uniform 80%,9,1.1332141117507748
+Baseline,Uniform 80%,10,1.2404559944600768
+Baseline,Uniform 80%,11,1.3612167052944981
+Baseline,Uniform 80%,12,1.495967844033639
+Baseline,Uniform 80%,13,1.645452560977155
+Baseline,Uniform 80%,14,1.810640377046732
+Baseline,Uniform 80%,15,1.9926972561694243
+Baseline,Uniform 80%,16,2.192966512131282
+Baseline,Uniform 80%,17,2.4129573848394106
+Baseline,Uniform 80%,18,2.654339015074836
+Baseline,Uniform 80%,19,2.9189381844434155
+Baseline,Uniform 80%,20,3.2087396184722263
+Baseline,Uniform 80%,21,3.5258879538298324
+Baseline,Uniform 80%,22,3.872690728099714
+Baseline,Uniform 80%,23,4.251621853804903
+Baseline,Uniform 80%,24,4.665325191022079
+Baseline,Uniform 80%,25,5.116617881859419
+Baseline,Uniform 80%,26,5.608493203159533
+Baseline,Uniform 80%,27,6.144122727134507
+Baseline,Uniform 80%,28,6.726857649577398
+Baseline,Uniform 80%,29,7.36022919141422
+Baseline,Uniform 80%,30,8.04794805392123
+Baseline,Uniform 80%,31,8.79390298187393
+Baseline,Uniform 80%,32,9.602158580875185
+Baseline,Uniform 80%,33,10.476952642639265
+Baseline,Uniform 80%,34,11.422693360072614
+Baseline,Uniform 80%,35,12.443956916504352
+Baseline,Uniform 80%,36,13.545486145554607
+Baseline,Uniform 80%,37,14.732191022908335
+Baseline,Uniform 80%,38,16.009151947626144
+Baseline,Uniform 80%,39,17.381626849245635
+Baseline,Uniform 80%,40,18.855063288296662
+Baseline,Uniform 80%,41,20.43511669680989
+Baseline,Uniform 80%,42,22.12767598164154
+Baseline,Uniform 80%,43,23.938897455566
+Baseline,Uniform 80%,44,25.87524798503067
+Baseline,Uniform 80%,45,27.94355792187325
+Baseline,Uniform 80%,46,30.151083960370972
+Baseline,Uniform 80%,47,32.505581541828114
+Baseline,Uniform 80%,48,35.01538587602772
+Baseline,Uniform 80%,49,37.68949995808827
+Baseline,Uniform 80%,50,40.53768730942292
+Baseline,Uniform 80%,51,43.57056646578264
+Baseline,Uniform 80%,52,46.79970360760654
+Baseline,Uniform 80%,53,50.23769921255645
+Baseline,Uniform 80%,54,53.898264172461545
+Baseline,Uniform 80%,55,57.79628060406146
+Baseline,Uniform 80%,56,61.94784253258904
+Baseline,Uniform 80%,57,66.3702717719501
+Baseline,Uniform 80%,58,71.08210472114715
+Baseline,Uniform 80%,59,76.1030463508041
+Baseline,Uniform 80%,60,81.45388841090153
+Baseline,Uniform 80%,61,87.15638983095639
+Baseline,Uniform 80%,62,93.23311834327409
+Baseline,Uniform 80%,63,99.70725351414517
+Baseline,Uniform 80%,64,106.60235263482548
+Baseline,Uniform 80%,65,113.94208232272189
+Baseline,Uniform 80%,66,121.74991988292943
+Baseline,Uniform 80%,67,130.04882993367383
+Baseline,Uniform 80%,68,138.86092307276868
+Baseline,Uniform 80%,69,148.2071045262497
+Baseline,Uniform 80%,70,158.10672150604594
+Baseline,Uniform 80%,71,168.57721909496146
+Baseline,Uniform 80%,72,179.63381499429136
+Baseline,Uniform 80%,73,191.28920304299837
+Baseline,Uniform 80%,74,203.55329534110902
+Baseline,Uniform 80%,75,216.4330119681427
+Baseline,Uniform 80%,76,229.93212547673187
+Baseline,Uniform 80%,77,244.05116579339844
+Baseline,Uniform 80%,78,258.7873885150782
+Baseline,Uniform 80%,79,274.13480682891355
+Baseline,Uniform 80%,80,290.0842845850751
+Baseline,Uniform 80%,81,306.623684812204
+Baseline,Uniform 80%,82,323.73806536964236
+Baseline,Uniform 80%,83,341.40991098119355
+Baseline,Uniform 80%,84,359.6193888268171
+Baseline,Uniform 80%,85,378.34461376971586
+Baseline,Uniform 80%,86,397.56190857164444
+Baseline,Uniform 80%,87,417.24604463483274
+Baseline,Uniform 80%,88,437.3704497538565
+Baseline,Uniform 80%,89,457.9073707604945
+Baseline,Uniform 80%,90,478.8279811177006
+Baseline,Uniform 80%,91,500.10242599924464
+Baseline,Uniform 80%,92,521.6998001964113
+Baseline,Uniform 80%,93,543.5880573001056
+Baseline,Uniform 80%,94,565.7338516830187
+Baseline,Uniform 80%,95,588.1023179746451
+Baseline,Uniform 80%,96,610.6567957780038
+Baseline,Uniform 80%,97,633.3585102221817
+Baseline,Uniform 80%,98,656.1662215975047
+Baseline,Uniform 80%,99,679.035859574145
+Baseline,Uniform 80%,100,701.9201593506064
+Baseline,Uniform 80%,101,724.7683184064377
+Baseline,Uniform 80%,102,747.5256932214861
+Baseline,Uniform 80%,103,770.1335553462866
+Baseline,Uniform 80%,104,792.5289254558957
+Baseline,Uniform 80%,105,814.6445024794652
+Baseline,Uniform 80%,106,836.4087025720258
+Baseline,Uniform 80%,107,857.7458196079093
+Baseline,Uniform 80%,108,878.5763151391449
+Baseline,Uniform 80%,109,898.817241498608
+Baseline,Uniform 80%,110,918.3827971262995
+Baseline,Uniform 80%,111,937.1850084760753
+Baseline,Uniform 80%,112,955.1345282474174
+Baseline,Uniform 80%,113,972.1415354277608
+Baseline,Uniform 80%,114,988.1167189336117
+Baseline,Uniform 80%,115,1002.9723236817738
+Baseline,Uniform 80%,116,1016.6232358253305
+Baseline,Uniform 80%,117,1028.9880827014708
+Baseline,Uniform 80%,118,1039.9903227501766
+Baseline,Uniform 80%,119,1049.559301195987
+Baseline,Uniform 80%,120,1057.6312485207168
+Baseline,Uniform 80%,121,1064.1502005489608
+Baseline,Uniform 80%,122,1069.0688211690558
+Baseline,Uniform 80%,123,1072.3491111897774
+Baseline,Uniform 80%,124,1073.962989484488
+Baseline,Uniform 80%,125,1073.892735336341
+Baseline,Uniform 80%,126,1072.1312837447933
+Baseline,Uniform 80%,127,1068.6823683844996
+Baseline,Uniform 80%,128,1063.5605099368638
+Baseline,Uniform 80%,129,1056.7908506499318
+Baseline,Uniform 80%,130,1048.4088392103868
+Baseline,Uniform 80%,131,1038.4597732859418
+Baseline,Uniform 80%,132,1026.9982103315526
+Baseline,Uniform 80%,133,1014.0872603276312
+Baseline,Uniform 80%,134,999.7977768862761
+Baseline,Uniform 80%,135,984.2074654663405
+Baseline,Uniform 80%,136,967.3999291343843
+Baseline,Uniform 80%,137,949.4636732794538
+Baseline,Uniform 80%,138,930.4910908639287
+Baseline,Uniform 80%,139,910.5774491549145
+Baseline,Uniform 80%,140,889.819897474628
+Baseline,Uniform 80%,141,868.316513433646
+Baseline,Uniform 80%,142,846.1654025131463
+Baseline,Uniform 80%,143,823.4638629177373
+Baseline,Uniform 80%,144,800.3076245190962
+Baseline,Uniform 80%,145,776.7901676380163
+Baseline,Uniform 80%,146,753.0021245340414
+Baseline,Uniform 80%,147,729.0307639202413
+Baseline,Uniform 80%,148,704.9595566877299
+Baseline,Uniform 80%,149,680.867819358448
+Baseline,Uniform 80%,150,656.8304305917931
+Baseline,Uniform 80%,151,632.9176153210238
+Baseline,Uniform 80%,152,609.1947907315854
+Baseline,Uniform 80%,153,585.7224682406348
+Baseline,Uniform 80%,154,562.5562058127373
+Baseline,Uniform 80%,155,539.7466052702332
+Baseline,Uniform 80%,156,517.3393496562676
+Baseline,Uniform 80%,157,495.3752761256521
+Baseline,Uniform 80%,158,473.8904802313357
+Baseline,Uniform 80%,159,452.9164478161729
+Baseline,Uniform 80%,160,432.4802109993262
+Baseline,Uniform 80%,161,412.6045249642819
+Baseline,Uniform 80%,162,393.308062419805
+Baseline,Uniform 80%,163,374.6056227300221
+Baseline,Uniform 80%,164,356.50835281103696
+Baseline,Uniform 80%,165,339.0239769844778
+Baseline,Uniform 80%,166,322.1570330763793
+Baseline,Uniform 80%,167,305.9091121628548
+Baseline,Uniform 80%,168,290.27909949850334
+Baseline,Uniform 80%,169,275.263414322265
+Baseline,Uniform 80%,170,260.8562464182103
+Baseline,Uniform 80%,171,247.04978751275564
+Baseline,Uniform 80%,172,233.83445581050586
+Baseline,Uniform 80%,173,221.1991122027332
+Baseline,Uniform 80%,174,209.13126691939596
+Baseline,Uniform 80%,175,197.61727563163078
+Baseline,Uniform 80%,176,186.64252424137985
+Baseline,Uniform 80%,177,176.19160181351654
+Baseline,Uniform 80%,178,166.24846131067085
+Baseline,Uniform 80%,179,156.79656797306694
+Baseline,Uniform 80%,180,147.81903535735205
+Baseline,Uniform 80%,181,139.29874919852378
+Baseline,Uniform 80%,182,131.21847936206004
+Baseline,Uniform 80%,183,123.56098028684167
+Baseline,Uniform 80%,184,116.30908039229845
+Baseline,Uniform 80%,185,109.44576097531045
+Baseline,Uniform 80%,186,102.95422519086033
+Baseline,Uniform 80%,187,96.81795773593156
+Baseline,Uniform 80%,188,91.02077587447666
+Baseline,Uniform 80%,189,85.54687245355613
+Baseline,Uniform 80%,190,80.38085155553334
+Baseline,Uniform 80%,191,75.50775742214626
+Baseline,Uniform 80%,192,70.91309726901792
+Baseline,Uniform 80%,193,66.58285858591182
+Baseline,Uniform 80%,194,62.50352149146122
+Baseline,Uniform 80%,195,58.66206668084863
+Baseline,Uniform 80%,196,55.04597947276074
+Baseline,Uniform 80%,197,51.64325042855854
+Baseline,Uniform 80%,198,48.44237298257142
+Baseline,Uniform 80%,199,45.432338486533034
+Baseline,Uniform 80%,200,42.60262904630308
+Allocated,75% Small / 90% Large,0,1
+Allocated,75% Small / 90% Large,1,0.8782160515545661
+Allocated,75% Small / 90% Large,2,0.7916218444537292
+Allocated,75% Small / 90% Large,3,0.7317837760888445
+Allocated,75% Small / 90% Large,4,0.6923951886100962
+Allocated,75% Small / 90% Large,5,0.668744253312707
+Allocated,75% Small / 90% Large,6,0.6573171993443625
+Allocated,75% Small / 90% Large,7,0.6555022336257631
+Allocated,75% Small / 90% Large,8,0.6613683786211862
+Allocated,75% Small / 90% Large,9,0.673500222334334
+Allocated,75% Small / 90% Large,10,0.6908744846389068
+Allocated,75% Small / 90% Large,11,0.7127679009859065
+Allocated,75% Small / 90% Large,12,0.7386886159669999
+Allocated,75% Small / 90% Large,13,0.7683252290243863
+Allocated,75% Small / 90% Large,14,0.8015092282367886
+Allocated,75% Small / 90% Large,15,0.8381874905041811
+Allocated,75% Small / 90% Large,16,0.8784024713629653
+Allocated,75% Small / 90% Large,17,0.9222782788609148
+Allocated,75% Small / 90% Large,18,0.9700113017673359
+Allocated,75% Small / 90% Large,19,1.021864386165914
+Allocated,75% Small / 90% Large,20,1.0781638419244106
+Allocated,75% Small / 90% Large,21,1.1392987361533047
+Allocated,75% Small / 90% Large,22,1.2057221062747034
+Allocated,75% Small / 90% Large,23,1.2779538195076219
+Allocated,75% Small / 90% Large,24,1.3565848974007204
+Allocated,75% Small / 90% Large,25,1.4422832014611617
+Allocated,75% Small / 90% Large,26,1.5358004324876575
+Allocated,75% Small / 90% Large,27,1.6379804200148385
+Allocated,75% Small / 90% Large,28,1.7497687424228405
+Allocated,75% Small / 90% Large,29,1.8722237269983486
+Allocated,75% Small / 90% Large,30,2.006528917726757
+Allocated,75% Small / 90% Large,31,2.154007120018744
+Allocated,75% Small / 90% Large,32,2.316136150254065
+Allocated,75% Small / 90% Large,33,2.4945664436952013
+Allocated,75% Small / 90% Large,34,2.6911406902713146
+Allocated,75% Small / 90% Large,35,2.9079156882406667
+Allocated,75% Small / 90% Large,36,3.1471866244549234
+Allocated,75% Small / 90% Large,37,3.4115140060301457
+Allocated,75% Small / 90% Large,38,3.7037534859654384
+Allocated,75% Small / 90% Large,39,4.027088839575834
+Allocated,75% Small / 90% Large,40,4.385068360890673
+Allocated,75% Small / 90% Large,41,4.781644958283439
+Allocated,75% Small / 90% Large,42,5.221220234153999
+Allocated,75% Small / 90% Large,43,5.708692821267279
+Allocated,75% Small / 90% Large,44,6.249511276204753
+Allocated,75% Small / 90% Large,45,6.849731752201925
+Allocated,75% Small / 90% Large,46,7.516080698475518
+Allocated,75% Small / 90% Large,47,8.256022756597915
+Allocated,75% Small / 90% Large,48,9.077833959489698
+Allocated,75% Small / 90% Large,49,9.990680257858402
+Allocated,75% Small / 90% Large,50,11.00470126951281
+Allocated,75% Small / 90% Large,51,12.131098996551678
+Allocated,75% Small / 90% Large,52,13.382231065937793
+Allocated,75% Small / 90% Large,53,14.771707806459451
+Allocated,75% Small / 90% Large,54,16.314492192352706
+Allocated,75% Small / 90% Large,55,18.027001344030637
+Allocated,75% Small / 90% Large,56,19.927207878845834
+Allocated,75% Small / 90% Large,57,22.03473895713063
+Allocated,75% Small / 90% Large,58,24.370970365469407
+Allocated,75% Small / 90% Large,59,26.959112433796033
+Allocated,75% Small / 90% Large,60,29.824284010753217
+Allocated,75% Small / 90% Large,61,32.99357013944749
+Allocated,75% Small / 90% Large,62,36.496058516579424
+Allocated,75% Small / 90% Large,63,40.36284931683029
+Allocated,75% Small / 90% Large,64,44.627032563529795
+Allocated,75% Small / 90% Large,65,49.323626978705725
+Allocated,75% Small / 90% Large,66,54.489474257504845
+Allocated,75% Small / 90% Large,67,60.163082423247324
+Allocated,75% Small / 90% Large,68,66.384413875891
+Allocated,75% Small / 90% Large,69,73.19461198850668
+Allocated,75% Small / 90% Large,70,80.6356638985479
+Allocated,75% Small / 90% Large,71,88.74999648620502
+Allocated,75% Small / 90% Large,72,97.58000521103246
+Allocated,75% Small / 90% Large,73,107.16751653781577
+Allocated,75% Small / 90% Large,74,117.55318675905305
+Allocated,75% Small / 90% Large,75,128.77584154658933
+Allocated,75% Small / 90% Large,76,140.8717621787259
+Allocated,75% Small / 90% Large,77,153.87392589615595
+Allocated,75% Small / 90% Large,78,167.8112092189299
+Allocated,75% Small / 90% Large,79,182.7075644202082
+Allocated,75% Small / 90% Large,80,198.58118076537454
+Allocated,75% Small / 90% Large,81,215.44364353607858
+Allocated,75% Small / 90% Large,82,233.29910562033274
+Allocated,75% Small / 90% Large,83,252.1434879396411
+Allocated,75% Small / 90% Large,84,271.96372653068715
+Allocated,75% Small / 90% Large,85,292.7370851536655
+Allocated,75% Small / 90% Large,86,314.4305528395932
+Allocated,75% Small / 90% Large,87,337.0003457685396
+Allocated,75% Small / 90% Large,88,360.39153175245775
+Allocated,75% Small / 90% Large,89,384.53779413372314
+Allocated,75% Small / 90% Large,90,409.36134980243213
+Allocated,75% Small / 90% Large,91,434.7730341803268
+Allocated,75% Small / 90% Large,92,460.6725640374932
+Allocated,75% Small / 90% Large,93,486.9489874314942
+Allocated,75% Small / 90% Large,94,513.4813286645275
+Allocated,75% Small / 90% Large,95,540.1394344374461
+Allocated,75% Small / 90% Large,96,566.785025002903
+Allocated,75% Small / 90% Large,97,593.2729500737603
+Allocated,75% Small / 90% Large,98,619.4526433496372
+Allocated,75% Small / 90% Large,99,645.1697614996413
+Allocated,75% Small / 90% Large,100,670.2679837591853
+Allocated,75% Small / 90% Large,101,694.5909373694635
+Allocated,75% Small / 90% Large,102,717.9842038291138
+Allocated,75% Small / 90% Large,103,740.297352275826
+Allocated,75% Small / 90% Large,104,761.385941708223
+Allocated,75% Small / 90% Large,105,781.1134325491001
+Allocated,75% Small / 90% Large,106,799.3529525706907
+Allocated,75% Small / 90% Large,107,815.988871280858
+Allocated,75% Small / 90% Large,108,830.9181492644476
+Allocated,75% Small / 90% Large,109,844.0514433735009
+Allocated,75% Small / 90% Large,110,855.3139622854834
+Allocated,75% Small / 90% Large,111,864.6460794244612
+Allocated,75% Small / 90% Large,112,872.0037185476841
+Allocated,75% Small / 90% Large,113,877.3585315724156
+Allocated,75% Small / 90% Large,114,880.6978885363943
+Allocated,75% Small / 90% Large,115,882.0246971168243
+Allocated,75% Small / 90% Large,116,881.3570645312813
+Allocated,75% Small / 90% Large,117,878.7278102650821
+Allocated,75% Small / 90% Large,118,874.1838347479855
+Allocated,75% Small / 90% Large,119,867.7853479332249
+Allocated,75% Small / 90% Large,120,859.6049626491111
+Allocated,75% Small / 90% Large,121,849.7266605426632
+Allocated,75% Small / 90% Large,122,838.2446425769978
+Allocated,75% Small / 90% Large,123,825.2620802799812
+Allocated,75% Small / 90% Large,124,810.8897879667448
+Allocated,75% Small / 90% Large,125,795.2448387586835
+Allocated,75% Small / 90% Large,126,778.44914858705
+Allocated,75% Small / 90% Large,127,760.628052263894
+Allocated,75% Small / 90% Large,128,741.9088945828249
+Allocated,75% Small / 90% Large,129,722.4196578478616
+Allocated,75% Small / 90% Large,130,702.2876448714445
+Allocated,75% Small / 90% Large,131,681.6382345127353
+Allocated,75% Small / 90% Large,132,660.5937246785709
+Allocated,75% Small / 90% Large,133,639.2722759963996
+Allocated,75% Small / 90% Large,134,617.7869674250039
+Allocated,75% Small / 90% Large,135,596.2449731004659
+Allocated,75% Small / 90% Large,136,574.7468675728364
+Allocated,75% Small / 90% Large,137,553.386064088536
+Allocated,75% Small / 90% Large,138,532.2483879422728
+Allocated,75% Small / 90% Large,139,511.41178390656023
+Allocated,75% Small / 90% Large,140,490.94615380908266
+Allocated,75% Small / 90% Large,141,470.9133174915418
+Allocated,75% Small / 90% Large,142,451.3670878818139
+Allocated,75% Small / 90% Large,143,432.3534487029262
+Allocated,75% Small / 90% Large,144,413.9108218397896
+Allocated,75% Small / 90% Large,145,396.070410337713
+Allocated,75% Small / 90% Large,146,378.85660271409074
+Allocated,75% Small / 90% Large,147,362.2874242604448
+Allocated,75% Small / 90% Large,148,346.37502163671303
+Allocated,75% Small / 90% Large,149,331.12616825891433
+Allocated,75% Small / 90% Large,150,316.5427783143763
+Allocated,75% Small / 90% Large,151,302.6224206004843
+Allocated,75% Small / 90% Large,152,289.3588226068376
+Allocated,75% Small / 90% Large,153,276.74235805545396
+Allocated,75% Small / 90% Large,154,264.76051239974595
+Allocated,75% Small / 90% Large,155,253.39832207032717
+Allocated,75% Small / 90% Large,156,242.63878438736154
+Allocated,75% Small / 90% Large,157,232.46323622276537
+Allocated,75% Small / 90% Large,158,222.85170051565558
+Allocated,75% Small / 90% Large,159,213.78320031914942
+Allocated,75% Small / 90% Large,160,205.23604094097482
+Allocated,75% Small / 90% Large,161,197.18806106627628
+Allocated,75% Small / 90% Large,162,189.6168542303572
+Allocated,75% Small / 90% Large,163,182.49996227852253
+Allocated,75% Small / 90% Large,164,175.8150426183585
+Allocated,75% Small / 90% Large,165,169.54001122291228
+Allocated,75% Small / 90% Large,166,163.65316337183256
+Allocated,75% Small / 90% Large,167,158.13327413272023
+Allocated,75% Small / 90% Large,168,152.95968054992764
+Allocated,75% Small / 90% Large,169,148.11234743488188
+Allocated,75% Small / 90% Large,170,143.57191857023844
+Allocated,75% Small / 90% Large,171,139.31975503102316
+Allocated,75% Small / 90% Large,172,135.33796221282643
+Allocated,75% Small / 90% Large,173,131.60940703763936
+Allocated,75% Small / 90% Large,174,128.11772668454392
+Allocated,75% Small / 90% Large,175,124.84733007290377
+Allocated,75% Small / 90% Large,176,121.78339320726172
+Allocated,75% Small / 90% Large,177,118.91184938044135
+Allocated,75% Small / 90% Large,178,116.21937512457013
+Allocated,75% Small / 90% Large,179,113.69337269918186
+Allocated,75% Small / 90% Large,180,111.32194981261779
+Allocated,75% Small / 90% Large,181,109.09389718695692
+Allocated,75% Small / 90% Large,182,106.99866449814293
+Allocated,75% Small / 90% Large,183,105.02633515157298
+Allocated,75% Small / 90% Large,184,103.16760028880515
+Allocated,75% Small / 90% Large,185,101.41373236307294
+Allocated,75% Small / 90% Large,186,99.75655856943301
+Allocated,75% Small / 90% Large,187,98.18843436927958
+Allocated,75% Small / 90% Large,188,96.7022173081909
+Allocated,75% Small / 90% Large,189,95.29124129017306
+Allocated,75% Small / 90% Large,190,93.9492914399431
+Allocated,75% Small / 90% Large,191,92.67057965750612
+Allocated,75% Small / 90% Large,192,91.44972094555088
+Allocated,75% Small / 90% Large,193,90.28171056974071
+Allocated,75% Small / 90% Large,194,89.16190209445892
+Allocated,75% Small / 90% Large,195,88.08598632166446
+Allocated,75% Small / 90% Large,196,87.04997114792118
+Allocated,75% Small / 90% Large,197,86.05016234411289
+Allocated,75% Small / 90% Large,198,85.08314525359943
+Allocated,75% Small / 90% Large,199,84.14576739737848
+Allocated,75% Small / 90% Large,200,83.23512196899426
+Allocated,91.64% Small / 75% Large,0,1
+Allocated,91.64% Small / 75% Large,1,0.8931919795142051
+Allocated,91.64% Small / 75% Large,2,0.8453527174087446
+Allocated,91.64% Small / 75% Large,3,0.8416946958493664
+Allocated,91.64% Small / 75% Large,4,0.8723785653418754
+Allocated,91.64% Small / 75% Large,5,0.9310410095291638
+Allocated,91.64% Small / 75% Large,6,1.0137807837056605
+Allocated,91.64% Small / 75% Large,7,1.1184617204237937
+Allocated,91.64% Small / 75% Large,8,1.2442355829604481
+Allocated,91.64% Small / 75% Large,9,1.391217465025096
+Allocated,91.64% Small / 75% Large,10,1.5602674490536903
+Allocated,91.64% Small / 75% Large,11,1.7528460345744281
+Allocated,91.64% Small / 75% Large,12,1.970921093651332
+Allocated,91.64% Small / 75% Large,13,2.21691067426086
+Allocated,91.64% Small / 75% Large,14,2.493650693352704
+Allocated,91.64% Small / 75% Large,15,2.8043797694804824
+Allocated,91.64% Small / 75% Large,16,3.152735620213144
+Allocated,91.64% Small / 75% Large,17,3.542758913476241
+Allocated,91.64% Small / 75% Large,18,3.9789014661252797
+Allocated,91.64% Small / 75% Large,19,4.466036268689973
+Allocated,91.64% Small / 75% Large,20,5.009467255927526
+Allocated,91.64% Small / 75% Large,21,5.614937002511304
+Allocated,91.64% Small / 75% Large,22,6.2886306538068055
+Allocated,91.64% Small / 75% Large,23,7.03717452598034
+Allocated,91.64% Small / 75% Large,24,7.8676280186307
+Allocated,91.64% Small / 75% Large,25,8.787467585661965
+Allocated,91.64% Small / 75% Large,26,9.804561869834698
+Allocated,91.64% Small / 75% Large,27,10.927137512051713
+Allocated,91.64% Small / 75% Large,28,12.163735760430306
+Allocated,91.64% Small / 75% Large,29,13.523160790301612
+Allocated,91.64% Small / 75% Large,30,15.014421669252265
+Allocated,91.64% Small / 75% Large,31,16.646671092381595
+Allocated,91.64% Small / 75% Large,32,18.429145391487467
+Allocated,91.64% Small / 75% Large,33,20.371111609638945
+Allocated,91.64% Small / 75% Large,34,22.48182903552016
+Allocated,91.64% Small / 75% Large,35,24.770533171470834
+Allocated,91.64% Small / 75% Large,36,27.24645111314344
+Allocated,91.64% Small / 75% Large,37,29.91885708861587
+Allocated,91.64% Small / 75% Large,38,32.79717556476288
+Allocated,91.64% Small / 75% Large,39,35.89113747713189
+Allocated,91.64% Small / 75% Large,40,39.210991499987514
+Allocated,91.64% Small / 75% Large,41,42.76776797649547
+Allocated,91.64% Small / 75% Large,42,46.57358764918359
+Allocated,91.64% Small / 75% Large,43,50.64200155817772
+Allocated,91.64% Small / 75% Large,44,54.98834266414285
+Allocated,91.64% Small / 75% Large,45,59.63006453848497
+Allocated,91.64% Small / 75% Large,46,64.58703868350868
+Allocated,91.64% Small / 75% Large,47,69.88177979856498
+Allocated,91.64% Small / 75% Large,48,75.53956838595006
+Allocated,91.64% Small / 75% Large,49,81.58844226611015
+Allocated,91.64% Small / 75% Large,50,88.0590331430198
+Allocated,91.64% Small / 75% Large,51,94.98423076525471
+Allocated,91.64% Small / 75% Large,52,102.39866537658017
+Allocated,91.64% Small / 75% Large,53,110.33800852839138
+Allocated,91.64% Small / 75% Large,54,118.83810264481272
+Allocated,91.64% Small / 75% Large,55,127.93393979398579
+Allocated,91.64% Small / 75% Large,56,137.6585223215192
+Allocated,91.64% Small / 75% Large,57,148.0416462512774
+Allocated,91.64% Small / 75% Large,58,159.10865949930184
+Allocated,91.64% Small / 75% Large,59,170.87925375154367
+Allocated,91.64% Small / 75% Large,60,183.36635463805325
+Allocated,91.64% Small / 75% Large,61,196.5751766443034
+Allocated,91.64% Small / 75% Large,62,210.5025072441171
+Allocated,91.64% Small / 75% Large,63,225.13627749664016
+Allocated,91.64% Small / 75% Large,64,240.4554645995899
+Allocated,91.64% Small / 75% Large,65,256.43035535220264
+Allocated,91.64% Small / 75% Large,66,273.0231769015613
+Allocated,91.64% Small / 75% Large,67,290.1890798510162
+Allocated,91.64% Small / 75% Large,68,307.87743260383354
+Allocated,91.64% Small / 75% Large,69,326.0333638825224
+Allocated,91.64% Small / 75% Large,70,344.5994708423183
+Allocated,91.64% Small / 75% Large,71,363.51759473268
+Allocated,91.64% Small / 75% Large,72,382.7305597543187
+Allocated,91.64% Small / 75% Large,73,402.1837673940746
+Allocated,91.64% Small / 75% Large,74,421.82654614263373
+Allocated,91.64% Small / 75% Large,75,441.6131675330705
+Allocated,91.64% Small / 75% Large,76,461.5034576242617
+Allocated,91.64% Small / 75% Large,77,481.4629555472265
+Allocated,91.64% Small / 75% Large,78,501.46259587567255
+Allocated,91.64% Small / 75% Large,79,521.4779194672468
+Allocated,91.64% Small / 75% Large,80,541.4878444705084
+Allocated,91.64% Small / 75% Large,81,561.4730560117212
+Allocated,91.64% Small / 75% Large,82,581.4140961520841
+Allocated,91.64% Small / 75% Large,83,601.2892549005192
+Allocated,91.64% Small / 75% Large,84,621.0723767812677
+Allocated,91.64% Small / 75% Large,85,640.730704872906
+Allocated,91.64% Small / 75% Large,86,660.2228853224761
+Allocated,91.64% Small / 75% Large,87,679.4972498170782
+Allocated,91.64% Small / 75% Large,88,698.4904820884869
+Allocated,91.64% Small / 75% Large,89,717.1267577744344
+Allocated,91.64% Small / 75% Large,90,735.3174258169107
+Allocated,91.64% Small / 75% Large,91,752.9612751700059
+Allocated,91.64% Small / 75% Large,92,769.9454042050221
+Allocated,91.64% Small / 75% Large,93,786.1466830947005
+Allocated,91.64% Small / 75% Large,94,801.4337730002845
+Allocated,91.64% Small / 75% Large,95,815.6696413179809
+Allocated,91.64% Small / 75% Large,96,828.7144905685137
+Allocated,91.64% Small / 75% Large,97,840.429000473246
+Allocated,91.64% Small / 75% Large,98,850.6777688464846
+Allocated,91.64% Small / 75% Large,99,859.3328271779136
+Allocated,91.64% Small / 75% Large,100,866.2771015687267
+Allocated,91.64% Small / 75% Large,101,871.4076889218558
+Allocated,91.64% Small / 75% Large,102,874.6388223080966
+Allocated,91.64% Small / 75% Large,103,875.9044086148924
+Allocated,91.64% Small / 75% Large,104,875.1600362661802
+Allocated,91.64% Small / 75% Large,105,872.3843711288811
+Allocated,91.64% Small / 75% Large,106,867.5798843960633
+Allocated,91.64% Small / 75% Large,107,860.7728861905204
+Allocated,91.64% Small / 75% Large,108,852.0128715635826
+Allocated,91.64% Small / 75% Large,109,841.3712188211439
+Allocated,91.64% Small / 75% Large,110,828.9393113547651
+Allocated,91.64% Small / 75% Large,111,814.8261807393119
+Allocated,91.64% Small / 75% Large,112,799.1557884909322
+Allocated,91.64% Small / 75% Large,113,782.0640750280385
+Allocated,91.64% Small / 75% Large,114,763.6959063919123
+Allocated,91.64% Small / 75% Large,115,744.2020424851036
+Allocated,91.64% Small / 75% Large,116,723.7362362824997
+Allocated,91.64% Small / 75% Large,117,702.4525534214555
+Allocated,91.64% Small / 75% Large,118,680.5029782586345
+Allocated,91.64% Small / 75% Large,119,658.0353482585517
+Allocated,91.64% Small / 75% Large,120,635.1916355845318
+Allocated,91.64% Small / 75% Large,121,612.1065747570882
+Allocated,91.64% Small / 75% Large,122,588.9066193449488
+Allocated,91.64% Small / 75% Large,123,565.7091993544041
+Allocated,91.64% Small / 75% Large,124,542.6222442026623
+Allocated,91.64% Small / 75% Large,125,519.7439333609783
+Allocated,91.64% Small / 75% Large,126,497.16263708340193
+Allocated,91.64% Small / 75% Large,127,474.95701224806936
+Allocated,91.64% Small / 75% Large,128,453.1962221910457
+Allocated,91.64% Small / 75% Large,129,431.9402538183356
+Allocated,91.64% Small / 75% Large,130,411.2403096318148
+Allocated,91.64% Small / 75% Large,131,391.139256239915
+Allocated,91.64% Small / 75% Large,132,371.6721141349289
+Allocated,91.64% Small / 75% Large,133,352.8665764618238
+Allocated,91.64% Small / 75% Large,134,334.74354606891006
+Allocated,91.64% Small / 75% Large,135,317.3176822040593
+Allocated,91.64% Small / 75% Large,136,300.5979491516256
+Allocated,91.64% Small / 75% Large,137,284.58816010950915
+Allocated,91.64% Small / 75% Large,138,269.2875105938464
+Allocated,91.64% Small / 75% Large,139,254.6910962397779
+Allocated,91.64% Small / 75% Large,140,240.79041073282605
+Allocated,91.64% Small / 75% Large,141,227.57382033243942
+Allocated,91.64% Small / 75% Large,142,215.02701205577657
+Allocated,91.64% Small / 75% Large,143,203.13341344698975
+Allocated,91.64% Small / 75% Large,144,191.8745823955852
+Allocated,91.64% Small / 75% Large,145,181.2305661715547
+Allocated,91.64% Small / 75% Large,146,171.18022938772458
+Allocated,91.64% Small / 75% Large,147,161.70155109748913
+Allocated,91.64% Small / 75% Large,148,152.77189168939788
+Allocated,91.64% Small / 75% Large,149,144.3682305790509
+Allocated,91.64% Small / 75% Large,150,136.46737599967636
+Allocated,91.64% Small / 75% Large,151,129.04614840696166
+Allocated,91.64% Small / 75% Large,152,122.08153916878805
+Allocated,91.64% Small / 75% Large,153,115.55084631479637
+Allocated,91.64% Small / 75% Large,154,109.43178916796296
+Allocated,91.64% Small / 75% Large,155,103.70260369311286
+Allocated,91.64% Small / 75% Large,156,98.34212037232575
+Allocated,91.64% Small / 75% Large,157,93.32982636566035
+Allocated,91.64% Small / 75% Large,158,88.645913644171
+Allocated,91.64% Small / 75% Large,159,84.27131469359998
+Allocated,91.64% Small / 75% Large,160,80.1877272890878
+Allocated,91.64% Small / 75% Large,161,76.37762973589294
+Allocated,91.64% Small / 75% Large,162,72.82428786252035
+Allocated,91.64% Small / 75% Large,163,69.51175494374621
+Allocated,91.64% Small / 75% Large,164,66.42486562341237
+Allocated,91.64% Small / 75% Large,165,63.549224802753336
+Allocated,91.64% Small / 75% Large,166,60.87119236034014
+Allocated,91.64% Small / 75% Large,167,58.37786447545252
+Allocated,91.64% Small / 75% Large,168,56.05705223845753
+Allocated,91.64% Small / 75% Large,169,53.897258149809325
+Allocated,91.64% Small / 75% Large,170,51.88765103381203
+Allocated,91.64% Small / 75% Large,171,50.01803982423901
+Allocated,91.64% Small / 75% Large,172,48.278846616143596
+Allocated,91.64% Small / 75% Large,173,46.66107932150931
+Allocated,91.64% Small / 75% Large,174,45.15630421546041
+Allocated,91.64% Small / 75% Large,175,43.75661861425967
+Allocated,91.64% Small / 75% Large,176,42.454623885889816
+Allocated,91.64% Small / 75% Large,177,41.24339895827044
+Allocated,91.64% Small / 75% Large,178,40.116474458726714
+Allocated,91.64% Small / 75% Large,179,39.06780759082171
+Allocated,91.64% Small / 75% Large,180,38.09175783073173
+Allocated,91.64% Small / 75% Large,181,37.18306350463487
+Allocated,91.64% Small / 75% Large,182,36.33681929077105
+Allocated,91.64% Small / 75% Large,183,35.54845467461017
+Allocated,91.64% Small / 75% Large,184,34.813713372648664
+Allocated,91.64% Small / 75% Large,185,34.12863372948181
+Allocated,91.64% Small / 75% Large,186,33.48953008372878
+Allocated,91.64% Small / 75% Large,187,32.89297509090019
+Allocated,91.64% Small / 75% Large,188,32.335782985196055
+Allocated,91.64% Small / 75% Large,189,31.81499375732521
+Allocated,91.64% Small / 75% Large,190,31.327858221585675
+Allocated,91.64% Small / 75% Large,191,30.871823942491755
+Allocated,91.64% Small / 75% Large,192,30.44452198907617
+Allocated,91.64% Small / 75% Large,193,30.04375448337922
+Allocated,91.64% Small / 75% Large,194,29.667482908800515
+Allocated,91.64% Small / 75% Large,195,29.313817143720748
+Allocated,91.64% Small / 75% Large,196,28.981005185175718
+Allocated,91.64% Small / 75% Large,197,28.66742352737677
+Allocated,91.64% Small / 75% Large,198,28.371568161623102
+Allocated,91.64% Small / 75% Large,199,28.09204616382887
+Allocated,91.64% Small / 75% Large,200,27.827567836934058
+Baseline,Uniform 90%,0,1
+Baseline,Uniform 90%,1,0.8775833621758001
+Baseline,Uniform 90%,2,0.7893407915555639
+Baseline,Uniform 90%,3,0.7270830003499766
+Baseline,Uniform 90%,4,0.6846226180842384
+Baseline,Uniform 90%,5,0.6572848958553978
+Baseline,Uniform 90%,6,0.6415383861356022
+Baseline,Uniform 90%,7,0.6347160814480791
+Baseline,Uniform 90%,8,0.6348047103938544
+Baseline,Uniform 90%,9,0.640285478755353
+Baseline,Uniform 90%,10,0.6500136731201578
+Baseline,Uniform 90%,11,0.6631276250966621
+Baseline,Uniform 90%,12,0.6789798693666694
+Baseline,Uniform 90%,13,0.6970850498339312
+Baseline,Uniform 90%,14,0.7170805521269111
+Baseline,Uniform 90%,15,0.7386967002796064
+Baseline,Uniform 90%,16,0.7617342112076055
+Baseline,Uniform 90%,17,0.7860471375958109
+Baseline,Uniform 90%,18,0.8115299705242973
+Baseline,Uniform 90%,19,0.8381078729941659
+Baseline,Uniform 90%,20,0.8657292946629256
+Baseline,Uniform 90%,21,0.8943603806747744
+Baseline,Uniform 90%,22,0.923980746549528
+Baseline,Uniform 90%,23,0.9545802706562692
+Baseline,Uniform 90%,24,0.9861566751072154
+Baseline,Uniform 90%,25,1.0187136908864645
+Baseline,Uniform 90%,26,1.0522596710384065
+Baseline,Uniform 90%,27,1.086806536733107
+Baseline,Uniform 90%,28,1.122368981913902
+Baseline,Uniform 90%,29,1.1589638705412084
+Baseline,Uniform 90%,30,1.1966097775456712
+Baseline,Uniform 90%,31,1.235326643128612
+Baseline,Uniform 90%,32,1.2751355079565756
+Baseline,Uniform 90%,33,1.3160583147919869
+Baseline,Uniform 90%,34,1.3581177529364676
+Baseline,Uniform 90%,35,1.4013371446791587
+Baseline,Uniform 90%,36,1.4457403571190162
+Baseline,Uniform 90%,37,1.4913517330935189
+Baseline,Uniform 90%,38,1.5381960402409318
+Baseline,Uniform 90%,39,1.586298431519992
+Baseline,Uniform 90%,40,1.63568441489726
+Baseline,Uniform 90%,41,1.6863798305907514
+Baseline,Uniform 90%,42,1.738410833688478
+Baseline,Uniform 90%,43,1.791803881451933
+Baseline,Uniform 90%,44,1.8465857237029122
+Baseline,Uniform 90%,45,1.902783396735437
+Baseline,Uniform 90%,46,1.9604242195492538
+Baseline,Uniform 90%,47,2.019535791598605
+Baseline,Uniform 90%,48,2.080145993167194
+Baseline,Uniform 90%,49,2.1422829872687887
+Baseline,Uniform 90%,50,2.2059752230765586
+Baseline,Uniform 90%,51,2.2712514410417417
+Baseline,Uniform 90%,52,2.3381406795744644
+Baseline,Uniform 90%,53,2.4066722832998524
+Baseline,Uniform 90%,54,2.4768759129279956
+Baseline,Uniform 90%,55,2.5487815567638132
+Baseline,Uniform 90%,56,2.6224195439009415
+Baseline,Uniform 90%,57,2.697820559096748
+Baseline,Uniform 90%,58,2.775015659707368
+Baseline,Uniform 90%,59,2.854036293182037
+Baseline,Uniform 90%,60,2.934914319548818
+Baseline,Uniform 90%,61,3.017682032387971
+Baseline,Uniform 90%,62,3.102372182926372
+Baseline,Uniform 90%,63,3.1890180067045977
+Baseline,Uniform 90%,64,3.2776532518959245
+Baseline,Uniform 90%,65,3.3683122095723834
+Baseline,Uniform 90%,66,3.461029745992285
+Baseline,Uniform 90%,67,3.5558413369636863
+Baseline,Uniform 90%,68,3.652783104145975
+Baseline,Uniform 90%,69,3.7518918533069687
+Baseline,Uniform 90%,70,3.853205114474122
+Baseline,Uniform 90%,71,3.956761183885083
+Baseline,Uniform 90%,72,4.062599167786022
+Baseline,Uniform 90%,73,4.17075902772574
+Baseline,Uniform 90%,74,4.281281627407845
+Baseline,Uniform 90%,75,4.394208780981366
+Baseline,Uniform 90%,76,4.509583302536641
+Baseline,Uniform 90%,77,4.627449056653186
+Baseline,Uniform 90%,78,4.747851009824877
+Baseline,Uniform 90%,79,4.87083528254252
+Baseline,Uniform 90%,80,4.99644920181701
+Baseline,Uniform 90%,81,5.124741353893339
+Baseline,Uniform 90%,82,5.255761636895837
+Baseline,Uniform 90%,83,5.389561313129729
+Baseline,Uniform 90%,84,5.52619306074348
+Baseline,Uniform 90%,85,5.665711024449655
+Baseline,Uniform 90%,86,5.808170864963561
+Baseline,Uniform 90%,87,5.953629806860111
+Baseline,Uniform 90%,88,6.102146684473499
+Baseline,Uniform 90%,89,6.253781985501734
+Baseline,Uniform 90%,90,6.408597891938898
+Baseline,Uniform 90%,91,6.566658317978279
+Baseline,Uniform 90%,92,6.72802894450591
+Baseline,Uniform 90%,93,6.892777249808343
+Baseline,Uniform 90%,94,7.060972536116073
+Baseline,Uniform 90%,95,7.232685951609852
+Baseline,Uniform 90%,96,7.407990507512048
+Baseline,Uniform 90%,97,7.586961089889688
+Baseline,Uniform 90%,98,7.769674465821924
+Baseline,Uniform 90%,99,7.956209283557164
+Baseline,Uniform 90%,100,8.146646066356384
+Baseline,Uniform 90%,101,8.341067199622298
+Baseline,Uniform 90%,102,8.539556911248406
+Baseline,Uniform 90%,103,8.742201244473982
+Baseline,Uniform 90%,104,8.949088023266423
+Baseline,Uniform 90%,105,9.16030680999814
+Baseline,Uniform 90%,106,9.375948855180132
+Baseline,Uniform 90%,107,9.596107038516614
+Baseline,Uniform 90%,108,9.820875802168397
+Baseline,Uniform 90%,109,10.050351075355017
+Baseline,Uniform 90%,110,10.284630190144767
+Baseline,Uniform 90%,111,10.523811788539648
+Baseline,Uniform 90%,112,10.767995720839409
+Baseline,Uniform 90%,113,11.017282935225545
+Baseline,Uniform 90%,114,11.27177535846275
+Baseline,Uniform 90%,115,11.531575768167903
+Baseline,Uniform 90%,116,11.796787656086046
+Baseline,Uniform 90%,117,12.067515082963737
+Baseline,Uniform 90%,118,12.343862525149772
+Baseline,Uniform 90%,119,12.625934713002517
+Baseline,Uniform 90%,120,12.913836461384625
+Baseline,Uniform 90%,121,13.207672492520334
+Baseline,Uniform 90%,122,13.507547251527855
+Baseline,Uniform 90%,123,13.813564714976307
+Baseline,Uniform 90%,124,14.125828192879224
+Baseline,Uniform 90%,125,14.444440124578518
+Baseline,Uniform 90%,126,14.769501868583792
+Baseline,Uniform 90%,127,15.101113487712004
+Baseline,Uniform 90%,128,15.439373529421056
+Baseline,Uniform 90%,129,15.784378801848922
+Baseline,Uniform 90%,130,16.136224146485215
+Baseline,Uniform 90%,131,16.49500220799458
+Baseline,Uniform 90%,132,16.860803201820787
+Baseline,Uniform 90%,133,17.23371468031521
+Baseline,Uniform 90%,134,17.613821298069244
+Baseline,Uniform 90%,135,18.001204577229835
+Baseline,Uniform 90%,136,18.39594267356596
+Baseline,Uniform 90%,137,18.798110144072336
+Baseline,Uniform 90%,138,19.207777716937148
+Baseline,Uniform 90%,139,19.62501206468854
+Baseline,Uniform 90%,140,20.049875581418043
+Baseline,Uniform 90%,141,20.482426164844355
+Baseline,Uniform 90%,142,20.922717004164525
+Baseline,Uniform 90%,143,21.370796374514423
+Baseline,Uniform 90%,144,21.826707438941014
+Baseline,Uniform 90%,145,22.290488058718875
+Baseline,Uniform 90%,146,22.762170612879597
+Baseline,Uniform 90%,147,23.241781827794682
+Baseline,Uniform 90%,148,23.729342617638014
+Baseline,Uniform 90%,149,24.224867936518123
+Baseline,Uniform 90%,150,24.72836664306552
+Baseline,Uniform 90%,151,25.239841378226643
+Baseline,Uniform 90%,152,25.75928845693573
+Baseline,Uniform 90%,153,26.28669777438148
+Baseline,Uniform 90%,154,26.82205272738829
+Baseline,Uniform 90%,155,27.36533015166337
+Baseline,Uniform 90%,156,27.916500274801113
+Baseline,Uniform 90%,157,28.475526686512023
+Baseline,Uniform 90%,158,29.04236632571556
+Baseline,Uniform 90%,159,29.616969484829113
+Baseline,Uniform 90%,160,30.19927983161971
+Baseline,Uniform 90%,161,30.789234448730383
+Baseline,Uniform 90%,162,31.386763890915308
+Baseline,Uniform 90%,163,31.99179225993515
+Baseline,Uniform 90%,164,32.604237296996715
+Baseline,Uniform 90%,165,33.22401049244351
+Baseline,Uniform 90%,166,33.85101721228335
+Baseline,Uniform 90%,167,34.4851568422659
+Baseline,Uniform 90%,168,35.126322946728
+Baseline,Uniform 90%,169,35.774403443250854
+Baseline,Uniform 90%,170,36.42928079250788
+Baseline,Uniform 90%,171,37.09083220197449
+Baseline,Uniform 90%,172,37.75892984264343
+Baseline,Uniform 90%,173,38.43344107796812
+Baseline,Uniform 90%,174,39.1142287039409
+Baseline,Uniform 90%,175,39.801151199223355
+Baseline,Uniform 90%,176,40.4940629841375
+Baseline,Uniform 90%,177,41.19281468729038
+Baseline,Uniform 90%,178,41.89725341854669
+Baseline,Uniform 90%,179,42.60722304701011
+Baseline,Uniform 90%,180,43.32256448266082
+Baseline,Uniform 90%,181,44.04311596015974
+Baseline,Uniform 90%,182,44.768713323552234
+Baseline,Uniform 90%,183,45.49919031029296
+Baseline,Uniform 90%,184,46.234378833234
+Baseline,Uniform 90%,185,46.974109259075526
+Baseline,Uniform 90%,186,47.71821068191866
+Baseline,Uniform 90%,187,48.4665111904982
+Baseline,Uniform 90%,188,49.218838127738856
+Baseline,Uniform 90%,189,49.97501834130979
+Baseline,Uniform 90%,190,50.734878423926666
+Baseline,Uniform 90%,191,51.49824494217019
+Baseline,Uniform 90%,192,52.26494465265687
+Baseline,Uniform 90%,193,53.034804704527964
+Baseline,Uniform 90%,194,53.80765282723743
+Baseline,Uniform 90%,195,54.583317502725556
+Baseline,Uniform 90%,196,55.36162812115578
+Baseline,Uniform 90%,197,56.14241511948251
+Baseline,Uniform 90%,198,56.92551010221392
+Baseline,Uniform 90%,199,57.71074594383337
+Baseline,Uniform 90%,200,58.49795687244314

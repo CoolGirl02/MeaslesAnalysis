@@ -1,0 +1,6 @@
+Allocation,Minimum_Compartment_Value,Maximum_Population_Deviation
+Uniform 70%,0,4.092726157978177e-12
+Uniform 80%,0,6.366462912410498e-12
+75% Small / 90% Large,0,4.547473508864641e-12
+91.64% Small / 75% Large,0,3.183231456205249e-12
+Uniform 90%,0,5.4569682106375694e-12

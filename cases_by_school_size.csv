@@ -1,0 +1,5 @@
+school_type,Scenario,Schools,Population,Total_New_Cases
+Large,"Small 75%, Large 90%",26,29324,970.9662575167225
+Small,"Small 75%, Large 90%",63,26432,6428.76442619135
+Large,"Small 91.64%, Large 75%",26,29324,7140.40089646314
+Small,"Small 91.64%, Large 75%",63,26432,296.8359413447601

@@ -1,0 +1,6 @@
+Scenario,unit_id,school_name,school_size,vaccination_coverage,initially_infectious,cumulative_new_cases
+Uniform 70%,1270,Carver Middle,640,70,TRUE,188.7925832936376
+Uniform 80%,1270,Carver Middle,640,80,TRUE,119.51747397216562
+"Small 75%, Large 90%",1270,Carver Middle,640,75,TRUE,154.9126433763425
+"Small 91.64%, Large 75%",1270,Carver Middle,640,91.64119249394672,TRUE,19.229162081238805
+Uniform 90%,1270,Carver Middle,640,90,TRUE,35.7374927253346

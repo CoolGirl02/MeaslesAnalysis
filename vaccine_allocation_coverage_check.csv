@@ -1,0 +1,4 @@
+"Scenario","Small_Coverage","Large_Coverage","Aggregate_Coverage"
+"A: Small 75%, Large 90%",75,90,82.8890164287252
+"B: Small adjusted, Large 75%",91.6411924939467,75,82.8890164287252
+"C: Uniform at matched coverage",82.8890164287252,82.8890164287252,82.8890164287252

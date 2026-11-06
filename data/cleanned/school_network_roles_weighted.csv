@@ -1,0 +1,90 @@
+unit_id,degree,total_contacts,betweenness,closeness,eigenvector,school_name,type,total_students,measles_exposure,percent_immunized,date1,date2,date3,n_cases,as_of,county,herd_immunity,exposure_halo,network_role
+1270,88,88,0,1,0.9999999999999998,Carver Middle,Public,640,0,0.95,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1281,88,88,0,1,0.9999999999999997,Drayton Mills Elementary,Public,787,0,0.939,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1297,88,88,0,1,0.9999999999999997,Jesse Boyd Elementary,Public,507,0,0.909,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1306,88,88,0,1,0.9999999999999997,Mary H. Wright Elementary,Public,392,0,0.969,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1308,88,88,0,1,0.9999999999999997,McCracken Middle,Public,957,0,0.962,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1309,88,88,0,1,0.9999999999999997,Meeting Street Academy - Spartanburg,Public,216,0,0.995,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1318,88,88,0,1,0.9999999999999997,Pine St. Elementary,Public,620,0,0.948,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1324,88,88,0,1,0.9999999999999997,SC School for the Blind Elem/Middle,SC Sch Deaf & th Public,20,0,0.95,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1325,88,88,0,1,0.9999999999999998,SC School for the Blind High,SC Sch Deaf & th Public,26,0,0.923,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1326,88,88,0,1,0.9999999999999997,SC School for the Deaf Elementary/Middle,SC Sch Deaf & th Public,50,0,0.84,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1327,88,88,0,1,0.9999999999999999,SC School for the Deaf High,SC Sch Deaf & th Public,33,0,0.758,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1331,88,88,0,1,0.9999999999999997,Spartanburg High,Public,2152,0,0.963,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1332,88,88,0,1,0.9999999999999997,Spartanburg Preparatory School,Public,400,0,0.938,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1336,88,88,0,1,0.9999999999999998,The Cleveland Academy of Leadership,Public,498,0,0.916,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1263,88,88,0,1,0.9999999999999996,Boiling Springs Elementary,Public,852,1,0.804,12/12/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1264,88,88,0,1,0.9999999999999997,Boiling Springs High,Public,2781,1,0.915,1/20/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1265,88,88,0,1,0.9999999999999997,Boiling Springs Middle,Public,1114,1,0.75,11/21/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1269,88,88,0,1,0.9999999999999996,Carlisle-Foster's Grove Elementary,Public,513,0,0.75,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1272,88,88,0,1,0.9999999999999998,Chesnee Elementary,Public,607,0,0.929,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1273,88,88,0,1,0.9999999999999994,Chesnee High,Public,715,0,0.951,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1274,88,88,0,1,0.9999999999999998,Chesnee Middle,Public,585,0,0.921,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1276,88,88,0,1,0.9999999999999994,Cooley Springs-Fingerville Elementary,Public,314,1,0.771,1/23/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1296,88,88,0,1,0.9999999999999996,James H. Hendrix Elementary,Public,661,1,0.868,12/2/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1303,88,88,0,1,0.9999999999999997,Libertas Academy - Boiling Springs,Public,822,1,0.743,1/16/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1307,88,88,0,1,0.9999999999999996,Mayo Elementary,Public,314,1,0.895,1/23/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1315,88,88,0,1,0.9999999999999997,Oakland Elementary,Public,653,1,0.83,1/16/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1320,88,88,0,1,0.9999999999999998,Rainbow Lake Middle,Public,998,1,0.822,12/5/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1328,88,88,0,1,0.9999999999999998,Shoally Creek Elementary,Public,807,0,0.86,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1334,88,88,0,1,0.9999999999999997,Sugar Ridge Elementary,Public,890,1,0.775,1/6/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1342,88,88,0,1,0.9999999999999998,Woodruff Elementary,Public,651,0,0.975,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1343,88,88,0,1,0.9999999999999996,Woodruff High,Public,852,0,0.973,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1344,88,88,0,1,0.9999999999999997,Woodruff Middle,Public,699,0,0.95,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1345,88,88,0,1,0.9999999999999994,Woodruff Primary,Public,627,0,0.906,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1259,88,88,0,1,0.9999999999999998,Anderson Mill Elementary,Public,633,0,0.929,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1260,88,88,0,1,0.9999999999999998,Arcadia Elementary,Public,395,0,0.957,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1280,88,88,0,1,0.9999999999999998,Dorman High,Public,2870,1,0.959,12/5/2025,NA,NA,0,NA,spartanburg,95%+ MMR,Exposed School,Hub Institution
+1283,88,88,0,1,0.9999999999999997,E. P. Todd School,Public,462,0,0.877,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1285,88,88,0,1,0.9999999999999997,Fairforest Elementary,Public,839,1,0.825,10/7/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1286,88,88,0,1,0.9999999999999997,Fairforest Middle,Public,341,1,0.903,12/5/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1289,88,88,0,1,0.9999999999999997,GREEN Charter School Spartanburg,Public,415,0,0.865,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1290,88,88,0,1,0.9999999999999997,High Point Academy,Public,1297,0,0.87,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1298,88,88,0,1,0.9999999999999997,Jesse S. Bobo Elementary,Public,367,1,0.937,1/9/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1299,88,88,0,1,0.9999999999999996,L. E. Gable Middle,Public,779,0,0.942,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1304,88,88,0,1,0.9999999999999997,Lone Oak Elementary,Public,363,0,0.956,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1317,88,88,0,1,0.9999999999999996,Pauline-Glenn Springs Elementary,Public,498,0,0.934,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1319,88,88,0,1,0.9999999999999994,R. P. Dawkins Middle,Public,764,0,0.931,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1323,88,88,0,1,0.9999999999999996,Roebuck Elementary,Public,873,0,0.837,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1339,88,88,0,1,0.9999999999999997,West View Elementary,Public,649,0,0.932,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1341,88,88,0,1,0.9999999999999997,Woodland Heights Elementary,Public,393,0,0.939,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1266,88,88,0,1,0.9999999999999997,Broome High,Public,875,0,0.967,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1268,88,88,0,1,0.9999999999999997,Cannons Elementary,Public,339,1,0.947,1/23/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1275,88,88,0,1,0.9999999999999997,Clifdale Middle,Public,561,0,0.973,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1278,88,88,0,1,0.9999999999999997,Cowpens Elementary,Public,394,0,0.957,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1316,88,88,0,1,0.9999999999999997,Pacolet Elementary,Public,429,0,0.951,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1257,88,88,0,1,0.9999999999999997,Abner Creek Academy,Public,784,0,0.879,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1258,88,88,0,1,0.9999999999999997,Abner Creek Middle,Public,713,1,0.892,1/23/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1261,88,88,0,1,0.9999999999999998,Beech Springs Middle,Public,645,0,0.909,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1262,88,88,0,1,0.9999999999999997,Berry Shoals Elementary,Public,509,1,0.933,12/16/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1279,88,88,0,1,0.9999999999999997,D. R. Hill Middle,Public,533,1,0.88,11/21/2025,NA,NA,1,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1282,88,88,0,1,0.9999999999999997,Duncan Elementary School of the Arts,Public,587,0,0.913,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1287,88,88,0,1,0.9999999999999996,Florence Chapel Middle,Public,502,0,0.904,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1288,88,88,0,1,0.9999999999999997,Global Academy of SC,Public,607,1,0.213,10/7/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1294,88,88,0,1,0.9999999999999996,James Byrnes Freshman Academy,Public,880,0,0.901,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1295,88,88,0,1,0.9999999999999996,James F. Byrnes High,Public,2350,0,0.936,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1305,88,88,0,1,0.9999999999999996,Lyman Elementary,Public,693,1,0.886,11/21/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1321,88,88,0,1,0.9999999999999998,Reidville Elementary,Public,645,0,0.878,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1322,88,88,0,1,0.9999999999999998,River Ridge Elementary,Public,764,0,0.894,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1337,88,88,0,1,0.9999999999999997,Tyger River Elementary,Public,510,1,0.892,12/2/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1338,88,88,0,1,0.9999999999999998,Wellford Academy of Science and Technology,Public,592,0,0.851,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1267,88,88,0,1,0.9999999999999996,Campobello-Gramling School,Public,797,1,0.802,12/12/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1271,88,88,0,1,0.9999999999999996,Chapman High,Public,1012,1,0.873,12/2/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1291,88,88,0,1,0.9999999999999996,Holly Springs-Motlow Elementary,Public,482,1,0.797,1/16/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1292,88,88,0,1,0.9999999999999996,Inman Elementary,Public,456,0,0.789,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1293,88,88,0,1,0.9999999999999996,Inman Intermediate,Public,365,1,0.827,12/9/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1300,88,88,0,1,0.9999999999999998,Landrum High,Public,516,1,0.936,1/16/2026,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1301,88,88,0,1,0.9999999999999994,Landrum Middle,Public,218,0,0.894,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1312,88,88,0,1,0.9999999999999996,New Prospect Elementary,Public,391,1,0.818,12/19/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1313,88,88,0,1,0.9999999999999996,O. P. Earle Elementary,Public,448,0,0.866,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1335,88,88,0,1,0.9999999999999996,T. E. Mabry Middle,Public,415,1,0.81,12/2/2025,NA,NA,0,NA,spartanburg,Below 95% MMR,Exposed School,Hub Institution
+1277,88,88,0,1,0.9999999999999996,UMC of the Covenant Child Development Center,Private,15,0,0.8,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1284,88,88,0,1,0.9999999999999996,Eddlemon Adventist School,Private,55,0,0.782,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1302,88,88,0,1,0.9999999999999997,Legacy Christian School,Private,11,0,0.909,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1310,88,88,0,1,0.9999999999999997,Montessori Academy - Spartanburg,Private,24,0,0.917,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1311,88,88,0,1,0.9999999999999997,Mountain View Christian Academy,Private,153,0,0.817,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1314,88,88,0,1,0.9999999999999997,Oakbrook Preparatory Schools,Private,360,0,0.892,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1329,88,88,0,1,0.9999999999999997,Spartanburg Christian Academy,Private,605,0,0.825,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1330,88,88,0,1,0.9999999999999996,Spartanburg Day School,Private,484,0,0.948,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution
+1333,88,88,0,1,0.9999999999999997,St. Paul the Apostle Catholic School,Private,36,0,1,NA,NA,NA,0,NA,spartanburg,95%+ MMR,Unexposed School,Hub Institution
+1340,88,88,0,1,0.9999999999999998,Westgate Christian School,Private,310,0,0.468,NA,NA,NA,0,NA,spartanburg,Below 95% MMR,Unexposed School,Hub Institution

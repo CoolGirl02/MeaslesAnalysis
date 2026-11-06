@@ -1,0 +1,6 @@
+Scenario,Allocation,Small_School_Coverage,Large_School_Coverage,Overall_Coverage,Total_New_Cases_C,Peak_Burden_Ipeak,Peak_Day,Attack_Rate
+Baseline,Uniform 70%,70,70,70,16539,2402,89,29.66
+Baseline,Uniform 80%,80,80,80,10425,1074,125,18.7
+Allocated,75% Small / 90% Large,75,90,78.65,10902,1320,104,19.55
+Allocated,79.83% Small / 75% Large,79.83,75,78.65,11280,1157,116,20.23
+Baseline,Uniform 90%,90,90,90,433,58,200,0.78

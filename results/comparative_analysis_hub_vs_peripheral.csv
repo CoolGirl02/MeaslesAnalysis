@@ -1,0 +1,7 @@
+"Scenario","Seed Location","Node Type","Vaccine Coverage (v_s)","Peak Burden (Ipeak)","Peak Day (tpeak)","Total Cases (C)","County AR (%)"
+"Empirical","Carver Middle","Network Hub","95%",313,133,"4,028","7.22%"
+"Empirical","Carver Middle","Peripheral","95%",313,133,"4,028","7.22%"
+"Standardized (74%)","Carver Middle","Network Hub","74%",2174,108,"14,218","25.50%"
+"Standardized (74%)","Carver Middle","Peripheral","74%",2174,108,"14,218","25.50%"
+"Standardized (91.6%)","Carver Middle","Network Hub","91.6%",2,200,"31","0.05%"
+"Standardized (91.6%)","Carver Middle","Peripheral","91.6%",2,200,"31","0.05%"

@@ -1,0 +1,90 @@
+school_name,unit_Id,type,total_students,measles_exposure,percent_immunized,date1,date2,date3,n_cases,as_of,county
+Carver Middle,1270,Public,640,0,0.95,NA,NA,NA,0,NA,spartanburg
+Drayton Mills Elementary,1281,Public,787,0,0.939,NA,NA,NA,0,NA,spartanburg
+Jesse Boyd Elementary,1297,Public,507,0,0.909,NA,NA,NA,0,NA,spartanburg
+Mary H. Wright Elementary,1306,Public,392,0,0.969,NA,NA,NA,0,NA,spartanburg
+McCracken Middle,1308,Public,957,0,0.962,NA,NA,NA,0,NA,spartanburg
+Meeting Street Academy - Spartanburg,1309,Public,216,0,0.995,NA,NA,NA,0,NA,spartanburg
+Pine St. Elementary,1318,Public,620,0,0.948,NA,NA,NA,0,NA,spartanburg
+SC School for the Blind Elem/Middle,1324,SC Sch Deaf & th Public,20,0,0.95,NA,NA,NA,0,NA,spartanburg
+SC School for the Blind High,1325,SC Sch Deaf & th Public,26,0,0.923,NA,NA,NA,0,NA,spartanburg
+SC School for the Deaf Elementary/Middle,1326,SC Sch Deaf & th Public,50,0,0.84,NA,NA,NA,0,NA,spartanburg
+SC School for the Deaf High,1327,SC Sch Deaf & th Public,33,0,0.758,NA,NA,NA,0,NA,spartanburg
+Spartanburg High,1331,Public,2152,0,0.963,NA,NA,NA,0,NA,spartanburg
+Spartanburg Preparatory School,1332,Public,400,0,0.938,NA,NA,NA,0,NA,spartanburg
+The Cleveland Academy of Leadership,1336,Public,498,0,0.916,NA,NA,NA,0,NA,spartanburg
+Boiling Springs Elementary,1263,Public,852,1,0.804,12/12/2025,NA,NA,0,NA,spartanburg
+Boiling Springs High,1264,Public,2781,1,0.915,1/20/2026,NA,NA,0,NA,spartanburg
+Boiling Springs Middle,1265,Public,1114,1,0.75,11/21/2025,NA,NA,0,NA,spartanburg
+Carlisle-Foster's Grove Elementary,1269,Public,513,0,0.75,NA,NA,NA,0,NA,spartanburg
+Chesnee Elementary,1272,Public,607,0,0.929,NA,NA,NA,0,NA,spartanburg
+Chesnee High,1273,Public,715,0,0.951,NA,NA,NA,0,NA,spartanburg
+Chesnee Middle,1274,Public,585,0,0.921,NA,NA,NA,0,NA,spartanburg
+Cooley Springs-Fingerville Elementary,1276,Public,314,1,0.771,1/23/2026,NA,NA,0,NA,spartanburg
+James H. Hendrix Elementary,1296,Public,661,1,0.868,12/2/2025,NA,NA,0,NA,spartanburg
+Libertas Academy - Boiling Springs,1303,Public,822,1,0.743,1/16/2026,NA,NA,0,NA,spartanburg
+Mayo Elementary,1307,Public,314,1,0.895,1/23/2026,NA,NA,0,NA,spartanburg
+Oakland Elementary,1315,Public,653,1,0.83,1/16/2026,NA,NA,0,NA,spartanburg
+Rainbow Lake Middle,1320,Public,998,1,0.822,12/5/2025,NA,NA,0,NA,spartanburg
+Shoally Creek Elementary,1328,Public,807,0,0.86,NA,NA,NA,0,NA,spartanburg
+Sugar Ridge Elementary,1334,Public,890,1,0.775,1/6/2026,NA,NA,0,NA,spartanburg
+Woodruff Elementary,1342,Public,651,0,0.975,NA,NA,NA,0,NA,spartanburg
+Woodruff High,1343,Public,852,0,0.973,NA,NA,NA,0,NA,spartanburg
+Woodruff Middle,1344,Public,699,0,0.95,NA,NA,NA,0,NA,spartanburg
+Woodruff Primary,1345,Public,627,0,0.906,NA,NA,NA,0,NA,spartanburg
+Anderson Mill Elementary,1259,Public,633,0,0.929,NA,NA,NA,0,NA,spartanburg
+Arcadia Elementary,1260,Public,395,0,0.957,NA,NA,NA,0,NA,spartanburg
+Dorman High,1280,Public,2870,1,0.959,12/5/2025,NA,NA,0,NA,spartanburg
+E. P. Todd School,1283,Public,462,0,0.877,NA,NA,NA,0,NA,spartanburg
+Fairforest Elementary,1285,Public,839,1,0.825,10/7/2025,NA,NA,0,NA,spartanburg
+Fairforest Middle,1286,Public,341,1,0.903,12/5/2025,NA,NA,0,NA,spartanburg
+GREEN Charter School Spartanburg,1289,Public,415,0,0.865,NA,NA,NA,0,NA,spartanburg
+High Point Academy,1290,Public,1297,0,0.87,NA,NA,NA,0,NA,spartanburg
+Jesse S. Bobo Elementary,1298,Public,367,1,0.937,1/9/2026,NA,NA,0,NA,spartanburg
+L. E. Gable Middle,1299,Public,779,0,0.942,NA,NA,NA,0,NA,spartanburg
+Lone Oak Elementary,1304,Public,363,0,0.956,NA,NA,NA,0,NA,spartanburg
+Pauline-Glenn Springs Elementary,1317,Public,498,0,0.934,NA,NA,NA,0,NA,spartanburg
+R. P. Dawkins Middle,1319,Public,764,0,0.931,NA,NA,NA,0,NA,spartanburg
+Roebuck Elementary,1323,Public,873,0,0.837,NA,NA,NA,0,NA,spartanburg
+West View Elementary,1339,Public,649,0,0.932,NA,NA,NA,0,NA,spartanburg
+Woodland Heights Elementary,1341,Public,393,0,0.939,NA,NA,NA,0,NA,spartanburg
+Broome High,1266,Public,875,0,0.967,NA,NA,NA,0,NA,spartanburg
+Cannons Elementary,1268,Public,339,1,0.947,1/23/2026,NA,NA,0,NA,spartanburg
+Clifdale Middle,1275,Public,561,0,0.973,NA,NA,NA,0,NA,spartanburg
+Cowpens Elementary,1278,Public,394,0,0.957,NA,NA,NA,0,NA,spartanburg
+Pacolet Elementary,1316,Public,429,0,0.951,NA,NA,NA,0,NA,spartanburg
+Abner Creek Academy,1257,Public,784,0,0.879,NA,NA,NA,0,NA,spartanburg
+Abner Creek Middle,1258,Public,713,1,0.892,1/23/2026,NA,NA,0,NA,spartanburg
+Beech Springs Middle,1261,Public,645,0,0.909,NA,NA,NA,0,NA,spartanburg
+Berry Shoals Elementary,1262,Public,509,1,0.933,12/16/2025,NA,NA,0,NA,spartanburg
+D. R. Hill Middle,1279,Public,533,1,0.88,11/21/2025,NA,NA,1,NA,spartanburg
+Duncan Elementary School of the Arts,1282,Public,587,0,0.913,NA,NA,NA,0,NA,spartanburg
+Florence Chapel Middle,1287,Public,502,0,0.904,NA,NA,NA,0,NA,spartanburg
+Global Academy of SC,1288,Public,607,1,0.213,10/7/2025,NA,NA,0,NA,spartanburg
+James Byrnes Freshman Academy,1294,Public,880,0,0.901,NA,NA,NA,0,NA,spartanburg
+James F. Byrnes High,1295,Public,2350,0,0.936,NA,NA,NA,0,NA,spartanburg
+Lyman Elementary,1305,Public,693,1,0.886,11/21/2025,NA,NA,0,NA,spartanburg
+Reidville Elementary,1321,Public,645,0,0.878,NA,NA,NA,0,NA,spartanburg
+River Ridge Elementary,1322,Public,764,0,0.894,NA,NA,NA,0,NA,spartanburg
+Tyger River Elementary,1337,Public,510,1,0.892,12/2/2025,NA,NA,0,NA,spartanburg
+Wellford Academy of Science and Technology,1338,Public,592,0,0.851,NA,NA,NA,0,NA,spartanburg
+Campobello-Gramling School,1267,Public,797,1,0.802,12/12/2025,NA,NA,0,NA,spartanburg
+Chapman High,1271,Public,1012,1,0.873,12/2/2025,NA,NA,0,NA,spartanburg
+Holly Springs-Motlow Elementary,1291,Public,482,1,0.797,1/16/2026,NA,NA,0,NA,spartanburg
+Inman Elementary,1292,Public,456,0,0.789,NA,NA,NA,0,NA,spartanburg
+Inman Intermediate,1293,Public,365,1,0.827,12/9/2025,NA,NA,0,NA,spartanburg
+Landrum High,1300,Public,516,1,0.936,1/16/2026,NA,NA,0,NA,spartanburg
+Landrum Middle,1301,Public,218,0,0.894,NA,NA,NA,0,NA,spartanburg
+New Prospect Elementary,1312,Public,391,1,0.818,12/19/2025,NA,NA,0,NA,spartanburg
+O. P. Earle Elementary,1313,Public,448,0,0.866,NA,NA,NA,0,NA,spartanburg
+T. E. Mabry Middle,1335,Public,415,1,0.81,12/2/2025,NA,NA,0,NA,spartanburg
+UMC of the Covenant Child Development Center,1277,Private,15,0,0.8,NA,NA,NA,0,NA,spartanburg
+Eddlemon Adventist School,1284,Private,55,0,0.782,NA,NA,NA,0,NA,spartanburg
+Legacy Christian School,1302,Private,11,0,0.909,NA,NA,NA,0,NA,spartanburg
+Montessori Academy - Spartanburg,1310,Private,24,0,0.917,NA,NA,NA,0,NA,spartanburg
+Mountain View Christian Academy,1311,Private,153,0,0.817,NA,NA,NA,0,NA,spartanburg
+Oakbrook Preparatory Schools,1314,Private,360,0,0.892,NA,NA,NA,0,NA,spartanburg
+Spartanburg Christian Academy,1329,Private,605,0,0.825,NA,NA,NA,0,NA,spartanburg
+Spartanburg Day School,1330,Private,484,0,0.948,NA,NA,NA,0,NA,spartanburg
+St. Paul the Apostle Catholic School,1333,Private,36,0,1,NA,NA,NA,0,NA,spartanburg
+Westgate Christian School,1340,Private,310,0,0.468,NA,NA,NA,0,NA,spartanburg
