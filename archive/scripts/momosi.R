@@ -209,14 +209,11 @@ lowest_connectivity_ids <- match_six_schools(lowest_conn_patterns, df, fallback_
 # 8. NORMALISE ADJACENCY MATRIX (SPECTRAL RADIUS)
 # ============================================================
 
-spec_rad <- max(abs(eigen(A_raw, only.values = TRUE)$values))
-if (spec_rad > 0) {
-  A <- A_raw / spec_rad
-} else {
-  row_s <- rowSums(A_raw)
-  row_s[row_s == 0] <- 1
-  A <- A_raw / row_s
+spectral_radius <- max(Mod(eigen(A_raw, only.values = TRUE)$values))
+if (!is.finite(spectral_radius) || spectral_radius <= 0) {
+  stop("The network spectral radius is zero or invalid.")
 }
+A <- A_raw / spectral_radius
 
 
 # ============================================================

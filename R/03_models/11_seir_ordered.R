@@ -278,16 +278,16 @@ print(
 
 
 # ============================================================
-# 8. NORMALISE THE ADJACENCY MATRIX FOR THE MODEL
+# 8. NORMALISE THE ADJACENCY MATRIX BY ITS SPECTRAL RADIUS
 # ============================================================
 
-A <- A_raw
+spectral_radius <- max(Mod(eigen(A_raw, only.values = TRUE)$values))
 
-row_sums <- rowSums(A)
+if (!is.finite(spectral_radius) || spectral_radius <= 0) {
+  stop("The network spectral radius is zero or invalid.")
+}
 
-row_sums[row_sums == 0] <- 1
-
-A <- A / row_sums
+A <- A_raw / spectral_radius
 
 
 # ============================================================

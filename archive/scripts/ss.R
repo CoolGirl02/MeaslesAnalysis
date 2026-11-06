@@ -68,9 +68,6 @@ spectral_radius <- max(Re(eigen(A_raw)$values))
 
 # 3. Scale the ENTIRE network globally by this single number
 A <- A_raw / spectral_radius
-#row_sums <- rowSums(A)
-#row_sums[row_sums == 0] <- 1
-#A <- A / row_sums
 
 gamma_rate <- 1 / 7         # Infectious period (~7 days)
 sigma_rate <- 1 / 10        # Incubation period (~10 days)

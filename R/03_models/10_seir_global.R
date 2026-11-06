@@ -175,12 +175,14 @@ for (k in seq_len(nrow(net_df))) {
   }
 }
 
-# Row-normalise the adjacency matrix
-row_sums <- rowSums(A)
+# Normalise the adjacency matrix by its spectral radius
+spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))
 
-row_sums[row_sums == 0] <- 1
+if (!is.finite(spectral_radius) || spectral_radius <= 0) {
+  stop("The network spectral radius is zero or invalid.")
+}
 
-A <- A / row_sums
+A <- A / spectral_radius
 
 
 # ============================================================

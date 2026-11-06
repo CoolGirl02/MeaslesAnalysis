@@ -60,9 +60,11 @@ for (k in 1:nrow(net_df)) {
   }
 }
 
-row_sums <- rowSums(A)
-row_sums[row_sums == 0] <- 1
-A <- A / row_sums  
+spectral_radius <- max(Mod(eigen(A, only.values = TRUE)$values))
+if (!is.finite(spectral_radius) || spectral_radius <= 0) {
+  stop("The network spectral radius is zero or invalid.")
+}
+A <- A / spectral_radius  
 
 
 # Model Parameters & Initial Conditions
